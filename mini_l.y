@@ -6,6 +6,97 @@
   extern int currLine;
   extern int currPos;
   FILE* yyin;
+
+  struct program_semval {
+      std::string code;
+  }
+  struct function_semval {
+      std::string code;
+  }
+  struct dec_list_semval {
+      std::string code;
+  }
+  struct sta_loop_semval {
+      std::string code;
+  }
+  struct declaration_semval {
+      std::string code;
+  }
+  struct dec_help_semval {
+      std::string code;
+  }
+  struct array_size_semval {
+      std::string code;
+  }
+  struct statement_semval {
+      std::string code;
+  }
+  struct conditional_semval {
+      std::string code;
+  }
+  struct var_list_semval {
+      std::string code;
+  }
+  struct bool_expr {
+      std::string code;
+      std::string result_id;
+  }
+  struct relation_and_expr_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct relation_expr_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct relation_expr_help_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct comp_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct expression_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct expression_help_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct multiplicative_expr_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct multiplicative_expr_help_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct term_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct term_help_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct term_ident_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct var_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct ident_semval {
+      std::string code;
+      std::string result_id;
+  }
+  struct number_semval {
+      std::string code;
+      std::string result_id;
+  }
 %}
 
 %union {
