@@ -3,6 +3,9 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <string>
+  #include <sstream>
+  #include <iostream>
+
   void yyerror(const char* msg);
   extern int currLine;
   extern int currPos;
@@ -173,30 +176,135 @@
 
 %%
 
-program: { printf("program -> epsilon\n"); }
-    | function program { printf("program -> function program\n"); }
+program: 
+    { 
+        printf("program -> epsilon\n"); 
+        $$ = new program_struct;
+        $$->code = "";
+    }
+| 
+    function program { 
+        printf("program -> function program\n"); 
+        $$ = new program_struct;
+        std::ostringstream oss;
+        oss << $1->code; 
+        oss << $2->code;
+        $$->code = oss.str();
+        delete $1;
+        delete $2;
+        std::cout << "\n-----------------------\n" << std::endl;
+        std::cout << $$->code << std::endl;
+        delete $$;
+    }
 ;
 
-function: FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY { printf("function -> FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY\n"); }
+function: 
+    FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY { 
+        printf("function -> FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY\n"); 
+        $$ = new function_struct;
+        std::ostringstream oss;
+        oss << "func ";
+        oss << $2->code << std::endl;
+        oss << $5->code;
+        oss << $8->code;
+        oss << $11->code;
+        oss << "endfunc\n" << std::endl;
+        $$->code = oss.str();
+        delete $2;
+        delete $5;
+        delete $8;
+        delete $11;
+    }
 ;
 
-dec_list: { printf("dec_list -> epsilon\n"); }
-    | declaration SEMICOLON dec_list { printf("declaration SEMICOLON dec_list\n"); }
+dec_list: 
+    { 
+        printf("dec_list -> epsilon\n"); 
+        $$ = new dec_list_struct;
+        $$->code = "";
+
+    }
+| 
+    declaration SEMICOLON dec_list { 
+        printf("declaration SEMICOLON dec_list\n"); 
+        $$ = new dec_list_struct;
+        std::ostringstream oss;
+        oss << $1->code;
+        oss << $3->code;
+        $$->code = oss.str();
+        delete $1;
+        delete $3;
+    }
 ;
 
-sta_loop: statement SEMICOLON { printf("sta_loop -> statement SEMICOLON\n"); }
-    | statement SEMICOLON sta_loop { printf("sta_loop -> statement SEMICOLON sta_loop\n"); }
+sta_loop: 
+    statement SEMICOLON { 
+        printf("sta_loop -> statement SEMICOLON\n"); 
+        $$ = new sta_loop_struct;
+        std::ostringstream oss;
+        oss << $1->code;
+        $$->code = oss.str();
+        delete $1;
+    }
+| 
+    statement SEMICOLON sta_loop { 
+        printf("sta_loop -> statement SEMICOLON sta_loop\n");
+        $$ = new sta_loop_struct;
+        std::ostringstream oss;
+        oss << $1->code;
+        oss << $3->code;
+        $$->code = oss.str(); 
+        delete $1;
+        delete $3;
+    }
 ;
 
-declaration: dec_help COLON array_size INTEGER { printf("declaration -> dec_help COLON array_size INTEGER\n"); }
+declaration: 
+    dec_help COLON array_size INTEGER { 
+        printf("declaration -> dec_help COLON array_size INTEGER\n"); 
+        $$ = new declaration_struct;
+        std::ostringstream oss;
+        oss << ". " << $1->code << std::endl;
+        oss << $3->code;
+        $$->code = oss.str();
+        delete $1;
+        delete $3;
+    }
 ;
 
-dec_help: ident { printf("dec_help -> ident\n"); }
-    | ident COMMA dec_help { printf("dec_help -> ident comma_indent\n"); }
+dec_help: 
+    ident { 
+        printf("dec_help -> ident\n");
+        $$ = new dec_help_struct;
+        std::ostringstream oss;
+        oss << $1->code;
+        $$->code = oss.str();
+        delete $1;
+    }
+| 
+    ident COMMA dec_help { 
+        printf("dec_help -> ident comma_indent\n"); 
+        $$ = new dec_help_struct;
+        std::ostringstream oss;
+        oss << $1->code;
+        oss << $3->code;
+        $$->code = oss.str();
+        delete $1;
+        delete $3;
+    }
 ;
 
-array_size:  { printf("array_size -> epsilon\n"); }
-    | ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF { printf("array_size -> ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF\n"); }
+array_size:  
+    { 
+        printf("array_size -> epsilon\n"); 
+        $$ = new array_size_struct;
+        $$->code = "";
+    }
+| 
+    ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF { 
+        printf("array_size -> ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF\n"); 
+        // Write code here
+    }
 ;
 
 statement: var ASSIGN expression { printf("statement -> var ASSIGN expression\n"); }
@@ -204,8 +312,22 @@ statement: var ASSIGN expression { printf("statement -> var ASSIGN expression\n"
     | WHILE bool_expr BEGINLOOP sta_loop ENDLOOP { printf("statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP\n"); }
     | DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr { printf("statement -> DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr\n"); }
     | FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP { printf("statement -> FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP\n"); }
-    | READ var_list { printf("statement -> READ var_list\n"); }
-    | WRITE var_list { printf("statement -> WRITE var_list\n"); }
+    | READ var_list { 
+        printf("statement -> READ var_list\n"); 
+        $$ = new statement_struct;
+        std::ostringstream oss;
+        oss << ".< " << $2->code << std::endl;
+        $$->code = oss.str();
+        delete $2;
+    }
+    | WRITE var_list { 
+        printf("statement -> WRITE var_list\n"); 
+        $$ = new statement_struct;
+        std::ostringstream oss;
+        oss << ".> " << $2->code << std::endl;
+        $$->code = oss.str();
+        delete $2;
+    }
     | CONTINUE { printf("statement -> CONTINUE\n"); }
     | RETURN expression { printf("statement -> RETURN expression\n"); }
 ;
@@ -214,8 +336,26 @@ conditional: sta_loop { printf("conditional -> sta_loop \n"); }
     | sta_loop ELSE sta_loop { printf("conditional -> sta_loop ELSE sta_loop\n"); }
 ;
 
-var_list: var { printf("var_list -> var\n"); }
-    | var COMMA var_list { printf("var_list -> var\n"); }
+var_list: 
+    var { 
+        printf("var_list -> var\n"); 
+        $$ = new var_list_struct;
+        std::ostringstream oss;
+        oss << $1->code;
+        $$->code = oss.str();
+        delete $1;
+    }
+| 
+    var COMMA var_list { 
+        printf("var_list -> var COMMA var_list\n");
+        $$ = new var_list_struct;
+        std::ostringstream oss;
+        oss << $1->code;
+        oss << $3->code;
+        $$->code = oss.str();
+        delete $1; 
+        delete $3;
+    }
 ;
 
 bool_expr: relation_and_expr { printf("bool_expr -> relation_and_expr\n"); }
@@ -281,11 +421,29 @@ term_ident:  { printf("term_indent -> epsilon\n"); }
     | expression COMMA term_ident { printf("term_ident -> expression COMMA term_ident\n"); }
 ;
 
-var: ident { printf("var -> ident\n"); }
-    | ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET { printf("var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n"); }
+var: 
+    ident { 
+        printf("var -> ident\n"); 
+        $$ = new var_struct;
+        std::ostringstream oss;
+        oss << $1->code;
+        $$->code = oss.str();
+        delete $1;
+    }
+| 
+    ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET { 
+        printf("var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n"); 
+        // Write code here
+    }
 ;
 
-ident: IDENT { printf("ident -> IDENT %s\n", $1); }
+ident: 
+    IDENT { 
+        $$ = new ident_struct;
+        printf("ident -> IDENT %s\n", $1); 
+        $$->code = $1;
+        delete $1;
+    }
 ;
 
 number: NUMBER { printf("number -> NUMBER %d\n", $1); }
