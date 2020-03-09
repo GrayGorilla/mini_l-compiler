@@ -6,14 +6,14 @@ Mini_L is a new coding language defined by this Compiler.
 FOR COMPILATION 
 - bolt.cs.ucr.edu
     - OR -
-- gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1)
+- g++ version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1)
 - flex version 2.6.4
 - bison (GNU) version 3.0.4
 
 FOR EXECUTION   
 - bolt.cs.ucr.edu
     - OR -
-- gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1)
+- g++ version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1)
 
 **Examples**
 There are couple of example code files included in this repo. They can be used to make compiler parser work.  
