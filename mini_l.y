@@ -10,91 +10,91 @@
   int yylex();
   
 
-  struct program_semval {
+  struct program_struct {
       std::string code;
   };
-  struct function_semval {
+  struct function_struct {
       std::string code;
   };
-  struct dec_list_semval {
+  struct dec_list_struct {
       std::string code;
   };
-  struct sta_loop_semval {
+  struct sta_loop_struct {
       std::string code;
   };
-  struct declaration_semval {
+  struct declaration_struct {
       std::string code;
   };
-  struct dec_help_semval {
+  struct dec_help_struct {
       std::string code;
   };
-  struct array_size_semval {
+  struct array_size_struct {
       std::string code;
   };
-  struct statement_semval {
+  struct statement_struct {
       std::string code;
   };
-  struct conditional_semval {
+  struct conditional_struct {
       std::string code;
   };
-  struct var_list_semval {
+  struct var_list_struct {
       std::string code;
   };
   struct bool_expr {
       std::string code;
       std::string result_id;
   };
-  struct relation_and_expr_semval {
+  struct relation_and_expr_struct {
       std::string code;
       std::string result_id;
   };
-  struct relation_expr_semval {
+  struct relation_expr_struct {
       std::string code;
       std::string result_id;
   };
-  struct relation_expr_help_semval {
+  struct relation_expr_help_struct {
       std::string code;
       std::string result_id;
   };
-  struct comp_semval {
+  struct comp_struct {
       std::string code;
   };
-  struct expression_semval {
-      std::string code;
-      std::string result_id;
-  };
-  struct expression_help_semval {
-      std::string code;
-  };
-  struct multiplicative_expr_semval {
+  struct expression_struct {
       std::string code;
       std::string result_id;
   };
-  struct multiplicative_expr_help_semval {
+  struct expression_help_struct {
+      std::string code;
+  };
+  struct multiplicative_expr_struct {
       std::string code;
       std::string result_id;
   };
-  struct term_semval {
+  struct multiplicative_expr_help_struct {
       std::string code;
       std::string result_id;
   };
-  struct term_help_semval {
+  struct term_struct {
       std::string code;
       std::string result_id;
   };
-  struct term_ident_semval {
+  struct term_help_struct {
       std::string code;
       std::string result_id;
   };
-  struct var_semval {
+  struct term_ident_struct {
       std::string code;
       std::string result_id;
   };
-  struct ident_semval {
+  struct var_struct {
       std::string code;
       std::string result_id;
   };
-  struct number_semval {
+  struct ident_struct {
+      std::string code;
+      std::string result_id;
+  };
+  struct number_struct {
       std::string code;
       std::string result_id;
   };
@@ -103,6 +103,31 @@
 %union {
   int ival;
   char* sval;
+  struct program_struct *program_semval;
+  struct function_struct *function_semval;
+  struct dec_list_struct *dec_list_semval;
+  struct sta_loop_struct *sta_loop_semval;
+  struct declaration_struct *declaration_semval;
+  struct dec_help_struct *dec_help_semval;
+  struct array_size_struct *array_size_semval;
+  struct statement_struct *statement_semval;
+  struct conditional_struct *conditional_semval;
+  struct var_list_struct *var_list_semval;
+  struct bool_expr_struct *bool_expr_semval;
+  struct relation_and_expr_struct *relation_and_expr_semval;
+  struct relation_expr_struct *relation_expr_semval;
+  struct relation_expr_help_struct *relation_expr_help_semval;
+  struct comp_struct *comp_semval;
+  struct expression_struct *expression_semval;
+  struct expression_help_struct *expression_help_semval;
+  struct multiplicative_expr_struct *multiplicative_expr_semval;
+  struct multiplicative_expr_help_struct *multiplicative_expr_help_semval;
+  struct term_struct *term_semval;
+  struct term_help_struct *term_help_semval;
+  struct term_ident_struct *term_ident_semval;
+  struct var_struct *var_semval;
+  struct ident_struct *ident_semval;
+  struct number_struct *number_semval;
 }
 
 %error-verbose
@@ -110,6 +135,31 @@
 %token NUMBER FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY INTEGER ARRAY OF IF THEN ENDIF ELSE WHILE DO FOR BEGINLOOP ENDLOOP CONTINUE READ WRITE AND OR NOT TRUE FALSE RETURN SUB ADD MULT DIV MOD EQ NEQ LT GT LTE GTE IDENT SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN 
 %type <sval> IDENT
 %type <ival> NUMBER
+%type <program_semval> program
+%type <function_semval> function
+%type <dec_list_semval> dec_list
+%type <sta_loop_semval> sta_loop
+%type <declaration_semval> declaration
+%type <dec_help_semval> dec_help
+%type <array_size_semval> array_size
+%type <statement_semval> statement
+%type <conditional_semval> conditional
+%type <var_list_semval> var_list
+%type <bool_expr_semval> bool_expr
+%type <relation_and_expr_semval> relation_and_expr
+%type <relation_expr_semval> relation_expr
+%type <relation_expr_help_semval> relation_expr_help
+%type <comp_semval> comp
+%type <expression_semval> expression
+%type <expression_help_semval> expression_help
+%type <multiplicative_expr_semval> multiplicative_expr
+%type <multiplicative_expr_help_semval> multiplicative_expr_help
+%type <term_semval> term
+%type <term_help_semval> term_help
+%type <term_ident_semval> term_ident
+%type <var_semval> var
+%type <ident_semval> ident
+%type <number_semval> number
 %left L_PAREN R_PAREN
 %left L_SQUARE_BRACKET R_SQUARE_BRACKET
 %left MULT DIV MOD
