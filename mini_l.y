@@ -66,18 +66,11 @@
       std::string code;
       std::string result_id;
   };
-  struct expression_help_struct {
-      std::string code;
-  };
   struct multiplicative_expr_struct {
       std::string code;
       std::string result_id;
   };
-  struct multiplicative_expr_help_struct {
-      std::string code;
-      std::string result_id;
-  };
-  struct term_struct {
+    struct term_struct {
       std::string code;
       std::string result_id;
   };
@@ -122,9 +115,7 @@
   struct relation_expr_help_struct *relation_expr_help_semval;
   struct comp_struct *comp_semval;
   struct expression_struct *expression_semval;
-  struct expression_help_struct *expression_help_semval;
   struct multiplicative_expr_struct *multiplicative_expr_semval;
-  struct multiplicative_expr_help_struct *multiplicative_expr_help_semval;
   struct term_struct *term_semval;
   struct term_help_struct *term_help_semval;
   struct term_ident_struct *term_ident_semval;
@@ -154,9 +145,7 @@
 %type <relation_expr_help_semval> relation_expr_help
 %type <comp_semval> comp
 %type <expression_semval> expression
-%type <expression_help_semval> expression_help
 %type <multiplicative_expr_semval> multiplicative_expr
-%type <multiplicative_expr_help_semval> multiplicative_expr_help
 %type <term_semval> term
 %type <term_help_semval> term_help
 %type <term_ident_semval> term_ident
@@ -307,7 +296,16 @@ array_size:
     }
 ;
 
-statement: var ASSIGN expression { printf("statement -> var ASSIGN expression\n"); }
+statement: 
+    var ASSIGN expression { 
+        printf("statement -> var ASSIGN expression\n"); 
+        $$ = new statement_struct;
+        std::ostringstream oss;
+        oss << "= " << $1->code << ", " << $3->code << std::endl;
+        $$->code = oss.str();
+        delete $1;
+        delete $3;
+    }
     | IF bool_expr THEN conditional ENDIF { printf("statement -> bool_expr conditional\n"); }
     | WHILE bool_expr BEGINLOOP sta_loop ENDLOOP { printf("statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP\n"); }
     | DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr { printf("statement -> DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr\n"); }
@@ -320,7 +318,8 @@ statement: var ASSIGN expression { printf("statement -> var ASSIGN expression\n"
         $$->code = oss.str();
         delete $2;
     }
-    | WRITE var_list { 
+| 
+    WRITE var_list { 
         printf("statement -> WRITE var_list\n"); 
         $$ = new statement_struct;
         std::ostringstream oss;
@@ -385,25 +384,14 @@ comp: EQ { printf("comp -> EQ\n"); }
 ;
 
 expression: multiplicative_expr { printf("expression -> multiplicative_expr\n"); }
-    | multiplicative_expr expression_help { printf("expression -> multiplicative_expr expression_help\n"); }
-;
-
-expression_help: ADD multiplicative_expr { printf("expression_help -> ADD multiplicative_expr\n"); }
-    | SUB multiplicative_expr { printf("expression_help -> SUB multiplicative_expr\n"); }
-    | ADD multiplicative_expr expression_help { printf("expression_help -> ADD multiplicative_expr expression_help\n"); }
-    | SUB multiplicative_expr expression_help { printf("expression_help -> SUB multiplicative_expr expression_help\n"); }
+    | multiplicative_expr ADD expression { printf("expression -> multiplicative_expr ADD expression\n"); }
+    | multiplicative_expr SUB expression { printf("expression -> multiplicative_expr SUB expression\n"); }
 ;
 
 multiplicative_expr: term { printf("multiplicative_expr -> term\n"); }
-    | term multiplicative_expr_help { printf("multiplicative_expr -> term multiplicative_expr_help\n"); }
-;
-
-multiplicative_expr_help: MULT term { printf("multiplicative_expr_help -> MULT term\n"); }
-    | DIV term { printf("multiplicative_expr_help -> DIV term\n"); }
-    | MOD term { printf("multiplicative_expr_help -> MOD term\n"); }
-    | MULT term multiplicative_expr_help { printf("multiplicative_expr_help -> MULT term multiplicative_expr_help\n"); }
-    | DIV term multiplicative_expr_help { printf("multiplicative_expr_help -> DIV term multiplicative_expr_help\n"); }
-    | MOD term multiplicative_expr_help { printf("multiplicative_expr_help -> MOD term multiplicative_expr_help\n"); }
+    | term DIV multiplicative_expr { printf("multiplicative_expr -> term DIV multiplicative_expr\n"); }
+    | term MOD multiplicative_expr { printf("multiplicative_expr -> term MOD multiplicative_expr\n"); }
+    | term MULT multiplicative_expr { printf("multiplicative_expr -> term MULT multiplicative_expr\n"); }
 ;
 
 term: term_help { printf("term -> term_help\n"); }
