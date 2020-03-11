@@ -3,9 +3,11 @@ beginparams
 endparams
 beginlocals
 	n : integer;
+	r : integer;
 endlocals
 beginbody
-	read n;
-    n := n + 1 * 9 - 27 % 7 / 2 ;
+	read r;
+    n := 4 + 1 * 9 - 27 % 7 / 2 + 90;
 	write n;
+	write r;
 endbody

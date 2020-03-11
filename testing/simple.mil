@@ -1,0 +1,3 @@
+syntax: ./mini_l filename
+program -> epsilon
+** Line 1, position 2: syntax error, unexpected NUMBER, expecting $end
