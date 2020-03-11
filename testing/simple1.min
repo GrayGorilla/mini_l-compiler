@@ -6,6 +6,6 @@ beginlocals
 endlocals
 beginbody
 	read n;
-    n := n + 2 - 3;
+    n := n - 2 + 1 - 2;
 	write n;
 endbody

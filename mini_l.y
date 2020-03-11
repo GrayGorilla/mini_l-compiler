@@ -410,11 +410,11 @@ expression:
         delete $1;
     }
 | 
-    multiplicative_expr ADD expression { 
-        printf("expression -> multiplicative_expr ADD expression\n"); 
+    expression ADD multiplicative_expr { 
+        printf("expression -> expression ADD multiplicative_expr\n"); 
         $$ = new expression_struct;
         std::ostringstream oss;
-        oss << $3->code << $1->code;
+        oss << $1->code << $3->code;
         $$->result_id = tm->tempGen();
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "+ " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
@@ -423,11 +423,11 @@ expression:
         delete $3;
     }
 | 
-    multiplicative_expr SUB expression { 
-        printf("expression -> multiplicative_expr SUB expression\n"); 
+    expression SUB multiplicative_expr { 
+        printf("expression -> expression SUB multiplicative_expr\n"); 
         $$ = new expression_struct;
         std::ostringstream oss;
-        oss << $3->code << $1->code;
+        oss << $1->code << $3->code;
         $$->result_id = tm->tempGen();
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "- " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
