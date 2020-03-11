@@ -1,0 +1,31 @@
+ident -> IDENT main
+dec_list -> epsilon
+ident -> IDENT n
+dec_help -> ident
+array_size -> epsilon
+declaration -> dec_help COLON array_size INTEGER
+dec_list -> epsilon
+declaration SEMICOLON dec_list
+ident -> IDENT n
+var -> ident
+var_list -> var
+statement -> READ var_list
+ident -> IDENT n
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+sta_loop -> statement SEMICOLON
+sta_loop -> statement SEMICOLON sta_loop
+function -> FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY
+program -> epsilon
+program -> function program
+
+-----------------------
+
+func main
+. n
+.< n
+.> n
+endfunc
+
+
