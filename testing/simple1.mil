@@ -16,16 +16,17 @@ ident -> IDENT n
 var -> ident
 term_help -> var
 term -> term_help
-before $1
-before delete
 multiplicative_expr -> term
-number -> NUMBER 1
+number -> NUMBER 2
 term_help -> number
 term -> term_help
-before $1
-before delete
+multiplicative_expr -> term
+number -> NUMBER 3
+term_help -> number
+term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
+expression -> multiplicative_expr SUB expression
 expression -> multiplicative_expr ADD expression
 statement -> var ASSIGN expression
 ident -> IDENT n
@@ -44,9 +45,17 @@ program -> function program
 func main
 . n
 .< n
+. __temp__2
+= __temp__2, 3
+. __temp__1
+= __temp__1, 2
+. __temp__3
+- __temp__3, __temp__1, __temp__2
 . __temp__0
-+ __temp__0, n, 1
-= n, __temp__0
+= __temp__0, n
+. __temp__4
++ __temp__4, __temp__0, __temp__3
+= n, __temp__4
 .> n
 endfunc
 
