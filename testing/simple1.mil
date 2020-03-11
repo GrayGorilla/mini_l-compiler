@@ -18,20 +18,27 @@ term_help -> var
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
-number -> NUMBER 2
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> expression SUB multiplicative_expr
 number -> NUMBER 1
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
+number -> NUMBER 9
+term_help -> number
+term -> term_help
+multiplicative_expr -> term MULT multiplicative_expr
 expression -> expression ADD multiplicative_expr
-number -> NUMBER 2
+number -> NUMBER 27
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
+number -> NUMBER 7
+term_help -> number
+term -> term_help
+multiplicative_expr -> term MOD multiplicative_expr
+number -> NUMBER 2
+term_help -> number
+term -> term_help
+multiplicative_expr -> term DIV multiplicative_expr
 expression -> expression SUB multiplicative_expr
 statement -> var ASSIGN expression
 ident -> IDENT n
@@ -53,18 +60,26 @@ func main
 . __temp__0
 = __temp__0, n
 . __temp__1
-= __temp__1, 2
+= __temp__1, 1
 . __temp__2
-- __temp__2, __temp__0, __temp__1
+= __temp__2, 9
 . __temp__3
-= __temp__3, 1
+* __temp__3, __temp__1, __temp__2
 . __temp__4
-+ __temp__4, __temp__2, __temp__3
++ __temp__4, __temp__0, __temp__3
 . __temp__5
-= __temp__5, 2
+= __temp__5, 27
 . __temp__6
-- __temp__6, __temp__4, __temp__5
-= n, __temp__6
+= __temp__6, 7
+. __temp__7
+% __temp__7, __temp__5, __temp__6
+. __temp__8
+= __temp__8, 2
+. __temp__9
+/ __temp__9, __temp__7, __temp__8
+. __temp__10
+- __temp__10, __temp__4, __temp__9
+= n, __temp__10
 .> n
 endfunc
 

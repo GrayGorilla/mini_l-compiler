@@ -446,11 +446,45 @@ multiplicative_expr:
         delete $1;
     }
 | 
-    term DIV multiplicative_expr { printf("multiplicative_expr -> term DIV multiplicative_expr\n"); }
+    multiplicative_expr DIV term { 
+        printf("multiplicative_expr -> term DIV multiplicative_expr\n"); 
+        $$ = new multiplicative_expr_struct;
+        std::ostringstream oss;
+        oss << $1->code << $3->code;
+        $$->result_id = tm->tempGen();
+        oss << ". " << tm->getTemp($$->result_id) << std::endl; 
+        oss << "/ " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
+        $$->code = oss.str();
+        delete $1;
+        delete $3;
+
+    }
 | 
-    term MOD multiplicative_expr { printf("multiplicative_expr -> term MOD multiplicative_expr\n"); }
+    multiplicative_expr MOD term { 
+        printf("multiplicative_expr -> term MOD multiplicative_expr\n"); 
+        $$ = new multiplicative_expr_struct;
+        std::ostringstream oss;
+        oss << $1->code << $3->code;
+        $$->result_id = tm->tempGen();
+        oss << ". " << tm->getTemp($$->result_id) << std::endl; 
+        oss << "% " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
+        $$->code = oss.str();
+        delete $1;
+        delete $3;        
+    }
 | 
-    term MULT multiplicative_expr { printf("multiplicative_expr -> term MULT multiplicative_expr\n"); }
+    multiplicative_expr MULT term { 
+        printf("multiplicative_expr -> term MULT multiplicative_expr\n"); 
+        $$ = new multiplicative_expr_struct;
+        std::ostringstream oss;
+        oss << $1->code << $3->code;
+        $$->result_id = tm->tempGen();
+        oss << ". " << tm->getTemp($$->result_id) << std::endl; 
+        oss << "* " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
+        $$->code = oss.str();
+        delete $1;
+        delete $3;
+    }
 ;
 
 term: 
