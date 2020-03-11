@@ -6,12 +6,26 @@
   #include <sstream>
   #include <iostream>
 
-  void yyerror(const char* msg);
+  class TempManager {
+    private:
+        int nextTempID;
+    public:
+        TempManager() : nextTempID(0) {}
+        std::string tempGen();
+        std::string getTemp(int id);
+        int getTopTempID();
+  };
+
   extern int currLine;
   extern int currPos;
   extern FILE* yyin;
+  TempManager* tm;
+//   int nextTempID, labelID;
   int yylex();
-  
+  void yyerror(const char* msg);
+//   std::string tempGen();
+//   std::string getTemp(int id);
+
 
   struct program_struct {
       std::string code;
@@ -45,54 +59,54 @@
   };
   struct bool_expr {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct relation_and_expr_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct relation_expr_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct relation_expr_help_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct comp_struct {
       std::string code;
   };
   struct expression_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct multiplicative_expr_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
     struct term_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct term_help_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct term_ident_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct var_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct ident_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
   struct number_struct {
       std::string code;
-      std::string result_id;
+      int result_id;
   };
 %}
 
@@ -301,16 +315,24 @@ statement:
         printf("statement -> var ASSIGN expression\n"); 
         $$ = new statement_struct;
         std::ostringstream oss;
-        oss << "= " << $1->code << ", " << $3->code << std::endl;
+        int id = $3->result_id;
+        oss << ". " << tm->getTemp(id) << std::endl; 
+        oss << $3->code;
+        oss << "= " << $1->code << ", " << tm->getTemp(id) << std::endl;
         $$->code = oss.str();
         delete $1;
         delete $3;
     }
-    | IF bool_expr THEN conditional ENDIF { printf("statement -> bool_expr conditional\n"); }
-    | WHILE bool_expr BEGINLOOP sta_loop ENDLOOP { printf("statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP\n"); }
-    | DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr { printf("statement -> DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr\n"); }
-    | FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP { printf("statement -> FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP\n"); }
-    | READ var_list { 
+| 
+    IF bool_expr THEN conditional ENDIF { printf("statement -> bool_expr conditional\n"); }
+| 
+    WHILE bool_expr BEGINLOOP sta_loop ENDLOOP { printf("statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP\n"); }
+| 
+    DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr { printf("statement -> DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr\n"); }
+| 
+    FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP { printf("statement -> FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP\n"); }
+| 
+    READ var_list { 
         printf("statement -> READ var_list\n"); 
         $$ = new statement_struct;
         std::ostringstream oss;
@@ -383,25 +405,74 @@ comp: EQ { printf("comp -> EQ\n"); }
     | GTE { printf("comp -> GTE\n"); }
 ;
 
-expression: multiplicative_expr { printf("expression -> multiplicative_expr\n"); }
-    | multiplicative_expr ADD expression { printf("expression -> multiplicative_expr ADD expression\n"); }
-    | multiplicative_expr SUB expression { printf("expression -> multiplicative_expr SUB expression\n"); }
+expression: 
+    multiplicative_expr { 
+        printf("expression -> multiplicative_expr\n"); 
+        $$ = new expression_struct;
+        $$->code = $1->code;
+        delete $1;
+    }
+| 
+    multiplicative_expr ADD expression { 
+        printf("expression -> multiplicative_expr ADD expression\n"); 
+        $$ = new expression_struct;
+        std::ostringstream oss;
+        oss << "+ " << tm->tempGen() << ", " << $1->code << ", " << $3->code << std::endl;
+        $$->result_id = tm->getTopTempID();
+        $$->code = oss.str();
+        delete $1;
+        delete $3;
+    }
+| 
+    multiplicative_expr SUB expression { printf("expression -> multiplicative_expr SUB expression\n"); }
 ;
 
-multiplicative_expr: term { printf("multiplicative_expr -> term\n"); }
-    | term DIV multiplicative_expr { printf("multiplicative_expr -> term DIV multiplicative_expr\n"); }
-    | term MOD multiplicative_expr { printf("multiplicative_expr -> term MOD multiplicative_expr\n"); }
-    | term MULT multiplicative_expr { printf("multiplicative_expr -> term MULT multiplicative_expr\n"); }
+multiplicative_expr: 
+    term { 
+        printf("multiplicative_expr -> term\n"); 
+        $$ = new multiplicative_expr_struct;
+        $$->code = $1->code;
+        delete $1;
+    }
+| 
+    term DIV multiplicative_expr { printf("multiplicative_expr -> term DIV multiplicative_expr\n"); }
+| 
+    term MOD multiplicative_expr { printf("multiplicative_expr -> term MOD multiplicative_expr\n"); }
+| 
+    term MULT multiplicative_expr { printf("multiplicative_expr -> term MULT multiplicative_expr\n"); }
 ;
 
-term: term_help { printf("term -> term_help\n"); }
-    | SUB term_help { printf("term -> SUB term_help\n"); }
-    | ident L_PAREN term_ident R_PAREN { printf("term -> L_PAREN term_ident R_PAREN\n"); }
+term: 
+    term_help { 
+        printf("term -> term_help\n"); 
+        $$ = new term_struct;
+        std::cout << "before $1\n";
+        $$->code = $1->code;
+        std::cout << "before delete\n";
+        delete $1;
+    }
+| 
+    SUB term_help { printf("term -> SUB term_help\n"); }
+| 
+    ident L_PAREN term_ident R_PAREN { printf("term -> L_PAREN term_ident R_PAREN\n"); }
 ;
 
-term_help: var { printf("term_help -> var\n"); }
-    | number { printf("term_help -> number\n"); }
-    | L_PAREN expression R_PAREN { printf("term_help -> L_PAREN expression R_PAREN\n"); }
+term_help: 
+    var { 
+        printf("term_help -> var\n"); 
+        $$ = new term_help_struct;
+        $$->code = $1->code;
+        delete $1;
+    }
+| 
+    number { 
+        printf("term_help -> number\n"); 
+        $$ = new term_help_struct;
+        $$->code = $1->code;
+        delete $1;
+    }
+| 
+    L_PAREN expression R_PAREN { printf("term_help -> L_PAREN expression R_PAREN\n"); }
 ;
 
 term_ident:  { printf("term_indent -> epsilon\n"); }
@@ -413,9 +484,7 @@ var:
     ident { 
         printf("var -> ident\n"); 
         $$ = new var_struct;
-        std::ostringstream oss;
-        oss << $1->code;
-        $$->code = oss.str();
+        $$->code = $1->code;
         delete $1;
     }
 | 
@@ -427,14 +496,19 @@ var:
 
 ident: 
     IDENT { 
-        $$ = new ident_struct;
         printf("ident -> IDENT %s\n", $1); 
+        $$ = new ident_struct;
         $$->code = $1;
-        delete $1;
     }
 ;
 
-number: NUMBER { printf("number -> NUMBER %d\n", $1); }
+number: 
+    NUMBER { 
+        printf("number -> NUMBER %d\n", $1); 
+        $$ = new number_struct;
+        $$->code = std::to_string($1);
+
+    }
 ;
 
 %%
@@ -447,10 +521,24 @@ int main(int argc, char** argv) {
       printf("syntax: %s filename\n", argv[0]);
     }
   }
+  tm = new TempManager();
   yyparse();  // Calls yylex() for tokens
+  delete tm;
   return 0;
 }
 
 void yyerror(const char* msg) {
   printf("** Line %d, position %d: %s\n", currLine, currPos, msg);
+}
+
+std::string TempManager::tempGen() {
+    return "__temp__" + std::to_string(nextTempID++);
+}
+
+std::string TempManager::getTemp(int id) {
+    return "__temp__" + std::to_string(id);
+}
+
+int TempManager::getTopTempID() {
+    return nextTempID - 1;
 }
