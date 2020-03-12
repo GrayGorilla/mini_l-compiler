@@ -5,6 +5,8 @@
   #include <string>
   #include <sstream>
   #include <iostream>
+  #include <utility>
+  #include <queue>
 
   class TempManager {
     private:
@@ -53,6 +55,7 @@
   };
   struct var_list_struct {
       std::string code;
+      std::queue<std::pair<bool, std::string>> varTypes;
   };
   struct bool_expr {
       std::string code;
@@ -75,18 +78,22 @@
   };
   struct expression_struct {
       std::string code;
+      std::string value;
       int result_id;
   };
   struct multiplicative_expr_struct {
       std::string code;
+      std::string value;
       int result_id;
   };
     struct term_struct {
       std::string code;
+      std::string value;
       int result_id;
   };
   struct term_help_struct {
       std::string code;
+      std::string value;
       int result_id;
   };
   struct term_ident_struct {
@@ -96,6 +103,7 @@
   struct var_struct {
       std::string code;
       int result_id;
+      bool isArray;
   };
   struct ident_struct {
       std::string code;
@@ -103,6 +111,7 @@
   };
   struct number_struct {
       std::string code;
+      std::string value;
       int result_id;
   };
 %}
@@ -258,8 +267,11 @@ declaration:
         printf("declaration -> dec_help COLON array_size INTEGER\n"); 
         $$ = new declaration_struct;
         std::ostringstream oss;
-        oss << ". " << $1->code << std::endl;
-        oss << $3->code;
+        if ($3->code.empty()) {
+            oss << ". " << $1->code << std::endl;
+        } else {
+            oss << ".[] " << $1->code << $3->code << std::endl;
+        }
         $$->code = oss.str();
         delete $1;
         delete $3;
@@ -296,7 +308,11 @@ array_size:
 | 
     ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF { 
         printf("array_size -> ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF\n"); 
-        // Write code here
+        $$ = new array_size_struct();
+        std::ostringstream oss;
+        oss << ", " << $3->value;
+        $$->code = oss.str();
+        delete $3;
     }
 ;
 
@@ -325,7 +341,17 @@ statement:
         printf("statement -> READ var_list\n"); 
         $$ = new statement_struct;
         std::ostringstream oss;
-        oss << ".< " << $2->code << std::endl;
+        std::pair<bool, std::string> vType;
+        // Pops all variable types off the queue and puts into MIL code
+        while (! $2->varTypes.empty()) {
+            vType = $2->varTypes.front();
+            $2->varTypes.pop();
+            if (vType.first) {
+                oss << ".[]< " << vType.second << std::endl;
+            } else {
+                oss << ".< " << vType.second << std::endl;
+            }
+        }
         $$->code = oss.str();
         delete $2;
     }
@@ -334,7 +360,17 @@ statement:
         printf("statement -> WRITE var_list\n"); 
         $$ = new statement_struct;
         std::ostringstream oss;
-        oss << ".> " << $2->code << std::endl;
+        std::pair<bool, std::string> vType;
+        // Pops all variable types off the queue and puts into MIL code
+        while (! $2->varTypes.empty()) {
+            vType = $2->varTypes.front();
+            $2->varTypes.pop();
+            if (vType.first) {
+                oss << ".[]> " << vType.second << std::endl;
+            } else {
+                oss << ".> " << vType.second << std::endl;
+            }
+        }
         $$->code = oss.str();
         delete $2;
     }
@@ -353,6 +389,8 @@ var_list:
         std::ostringstream oss;
         oss << $1->code;
         $$->code = oss.str();
+        std::pair<bool, std::string> vType($1->isArray, $1->code);
+        $$->varTypes.push(vType);
         delete $1;
     }
 | 
@@ -362,6 +400,14 @@ var_list:
         std::ostringstream oss;
         oss << $1->code << $3->code;
         $$->code = oss.str();
+        std::pair<bool, std::string> vType;
+        while (! $3->varTypes.empty()) {
+            vType = $3->varTypes.front();
+            $3->varTypes.pop();
+            $$->varTypes.push(vType);
+        }
+        vType = std::make_pair($1->isArray, $1->code);
+        $$->varTypes.push(vType);
         delete $1; 
         delete $3;
     }
@@ -399,6 +445,9 @@ expression:
         $$ = new expression_struct;
         $$->result_id = $1->result_id;
         $$->code = $1->code;
+        if ($1->value.empty()) {
+            $$->value = "";
+        } else { $$->value = $1->value; }
         delete $1;
     }
 | 
@@ -435,6 +484,9 @@ multiplicative_expr:
         $$ = new multiplicative_expr_struct;
         $$->result_id = $1->result_id;
         $$->code = $1->code;
+        if ($1->value.empty()) {
+            $$->value = "";
+        } else { $$->value = $1->value; }
         delete $1;
     }
 | 
@@ -485,6 +537,9 @@ term:
         $$ = new term_struct;
         $$->result_id = $1->result_id;
         $$->code = $1->code;
+        if ($1->value.empty()) {
+            $$->value = "";
+        } else { $$->value = $1->value; }
         delete $1;
     }
 | 
@@ -510,6 +565,7 @@ term_help:
         $$ = new term_help_struct;
         $$->result_id = $1->result_id;
         $$->code = $1->code;
+        $$->value = $1->value;
         delete $1;
     }
 | 
@@ -526,12 +582,19 @@ var:
         printf("var -> ident\n"); 
         $$ = new var_struct;
         $$->code = $1->code;
+        $$->isArray = false;
         delete $1;
     }
 | 
     ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET { 
         printf("var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n"); 
-        // Write code here
+        $$ = new var_struct;
+        std::ostringstream oss;
+        oss << $1->code << ", " << $3->value;
+        $$->code = oss.str();
+        $$->isArray = true;
+        delete $1;
+        delete $3;
     }
 ;
 
@@ -548,10 +611,13 @@ number:
         printf("number -> NUMBER %d\n", $1); 
         $$ = new number_struct;
         std::ostringstream oss;
+        std::stringstream ss;
         $$->result_id = tm->tempGen();
         oss << ". " << tm->getTemp($$->result_id) << std::endl;
         oss << "= " << tm->getTemp($$->result_id) << ", " << $1 << std::endl;
+        ss << $1;
         $$->code = oss.str();
+        $$->value = ss.str();
     }
 ;
 
