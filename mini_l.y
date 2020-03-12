@@ -187,8 +187,7 @@ program:
         printf("program -> function program\n"); 
         $$ = new program_struct;
         std::ostringstream oss;
-        oss << $1->code; 
-        oss << $2->code;
+        oss << $1->code << $2->code;
         $$->code = oss.str();
         delete $1;
         delete $2;
@@ -203,11 +202,8 @@ function:
         printf("function -> FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY\n"); 
         $$ = new function_struct;
         std::ostringstream oss;
-        oss << "func ";
-        oss << $2->code << std::endl;
-        oss << $5->code;
-        oss << $8->code;
-        oss << $11->code;
+        oss << "func " << $2->code << std::endl;
+        oss << $5->code << $8->code << $11->code;
         oss << "endfunc\n" << std::endl;
         $$->code = oss.str();
         delete $2;
@@ -229,8 +225,7 @@ dec_list:
         printf("declaration SEMICOLON dec_list\n"); 
         $$ = new dec_list_struct;
         std::ostringstream oss;
-        oss << $1->code;
-        oss << $3->code;
+        oss << $1->code << $3->code;
         $$->code = oss.str();
         delete $1;
         delete $3;
@@ -251,8 +246,7 @@ sta_loop:
         printf("sta_loop -> statement SEMICOLON sta_loop\n");
         $$ = new sta_loop_struct;
         std::ostringstream oss;
-        oss << $1->code;
-        oss << $3->code;
+        oss << $1->code << $3->code;
         $$->code = oss.str(); 
         delete $1;
         delete $3;
@@ -286,8 +280,7 @@ dec_help:
         printf("dec_help -> ident comma_indent\n"); 
         $$ = new dec_help_struct;
         std::ostringstream oss;
-        oss << $1->code;
-        oss << $3->code;
+        oss << $1->code << $3->code;
         $$->code = oss.str();
         delete $1;
         delete $3;
@@ -367,8 +360,7 @@ var_list:
         printf("var_list -> var COMMA var_list\n");
         $$ = new var_list_struct;
         std::ostringstream oss;
-        oss << $1->code;
-        oss << $3->code;
+        oss << $1->code << $3->code;
         $$->code = oss.str();
         delete $1; 
         delete $3;
