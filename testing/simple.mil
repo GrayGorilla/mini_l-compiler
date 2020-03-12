@@ -1,3 +1,106 @@
-syntax: ./mini_l filename
+ident -> IDENT main
+dec_list -> epsilon
+ident -> IDENT n
+dec_help -> ident
+array_size -> epsilon
+declaration -> dec_help COLON array_size INTEGER
+ident -> IDENT r
+dec_help -> ident
+array_size -> epsilon
+declaration -> dec_help COLON array_size INTEGER
+dec_list -> epsilon
+declaration SEMICOLON dec_list
+declaration SEMICOLON dec_list
+ident -> IDENT r
+var -> ident
+var_list -> var
+statement -> READ var_list
+ident -> IDENT n
+var -> ident
+number -> NUMBER 4
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 1
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+number -> NUMBER 9
+term_help -> number
+term -> term_help
+multiplicative_expr -> term MULT multiplicative_expr
+expression -> expression ADD multiplicative_expr
+number -> NUMBER 27
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+number -> NUMBER 7
+term_help -> number
+term -> term_help
+multiplicative_expr -> term MOD multiplicative_expr
+number -> NUMBER 2
+term_help -> number
+term -> term_help
+multiplicative_expr -> term DIV multiplicative_expr
+expression -> expression SUB multiplicative_expr
+number -> NUMBER 90
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> expression ADD multiplicative_expr
+statement -> var ASSIGN expression
+ident -> IDENT n
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+ident -> IDENT r
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+sta_loop -> statement SEMICOLON
+sta_loop -> statement SEMICOLON sta_loop
+sta_loop -> statement SEMICOLON sta_loop
+sta_loop -> statement SEMICOLON sta_loop
+function -> FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY
 program -> epsilon
-** Line 1, position 2: syntax error, unexpected NUMBER, expecting $end
+program -> function program
+
+-----------------------
+
+func main
+. n
+. r
+.< r
+. __temp__0
+= __temp__0, 4
+. __temp__1
+= __temp__1, 1
+. __temp__2
+= __temp__2, 9
+. __temp__3
+* __temp__3, __temp__1, __temp__2
+. __temp__4
++ __temp__4, __temp__0, __temp__3
+. __temp__5
+= __temp__5, 27
+. __temp__6
+= __temp__6, 7
+. __temp__7
+% __temp__7, __temp__5, __temp__6
+. __temp__8
+= __temp__8, 2
+. __temp__9
+/ __temp__9, __temp__7, __temp__8
+. __temp__10
+- __temp__10, __temp__4, __temp__9
+. __temp__11
+= __temp__11, 90
+. __temp__12
++ __temp__12, __temp__10, __temp__11
+= n, __temp__12
+.> n
+.> r
+endfunc
+
+

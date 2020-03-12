@@ -560,7 +560,6 @@ number:
         oss << ". " << tm->getTemp($$->result_id) << std::endl;
         oss << "= " << tm->getTemp($$->result_id) << ", " << $1 << std::endl;
         $$->code = oss.str();
-
     }
 ;
 
@@ -593,5 +592,7 @@ int TempManager::getTopTempID() {
 }
 
 std::string TempManager::getTemp(int id) {
-    return "__temp__" + std::to_string(id);
+    std::stringstream ss;
+    ss << id;
+    return "__temp__" + ss.str();
 }
