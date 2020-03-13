@@ -20,11 +20,22 @@
         string getTemp(int id);
   };
 
+  class LabelManager {
+    private:
+        int nextLabelID;
+    public:
+        LabelManager() : nextLabelID(0) {}
+        int labelGen();
+        std::string getLabel(int id);
+  };
+
+
   extern int currLine;
   extern int currPos;
   extern FILE* yyin;
   const int NOT_ARRAY = -1;
   TempManager* tm;
+  LabelManager* lm;
   int yylex();
   void yyerror(const char* msg);
 
@@ -77,7 +88,7 @@
       int result_id;
   };
   struct comp_struct {
-      string code;
+      string comp;
   };
   struct expression_struct {
       string code;
@@ -470,18 +481,67 @@ relation_expr: relation_expr_help { printf("relation_expr -> relation_expr_help\
     | NOT relation_expr_help { printf("relation_expr -> NOT relation_expr_help\n"); }
 ;
 
-relation_expr_help: expression comp expression { printf("relation_expr_help -> expression comp expression\n"); }
-    | TRUE { printf("relation_expr_help -> TRUE\n"); }
-    | FALSE { printf("relation_expr_help -> FALSE\n"); }
-    | L_PAREN bool_expr R_PAREN { printf("relation_expr_help -> L_PAREN bool_expr R_PAREN\n"); }
+relation_expr_help: 
+    expression comp expression { 
+        printf("relation_expr_help -> expression comp expression\n"); 
+        $$ = new relation_expr_help_struct();
+    }
+| 
+    TRUE { 
+        printf("relation_expr_help -> TRUE\n"); 
+        $$ = new relation_expr_help_struct();
+        // Write code here
+    }
+| 
+    FALSE { 
+        printf("relation_expr_help -> FALSE\n"); 
+        $$ = new relation_expr_help_struct();
+        // Write code here
+    }
+| 
+    L_PAREN bool_expr R_PAREN { 
+        printf("relation_expr_help -> L_PAREN bool_expr R_PAREN\n"); 
+        $$ = new relation_expr_help_struct();
+        // Write code here
+    }
 ;
 
-comp: EQ { printf("comp -> EQ\n"); }
-    | NEQ { printf("comp -> NEQ\n"); }
-    | LT { printf("comp -> LT\n"); }
-    | GT { printf("comp -> GT\n"); }
-    | LTE { printf("comp -> LTE\n"); }
-    | GTE { printf("comp -> GTE\n"); }
+comp: 
+    EQ { 
+        printf("comp -> EQ\n");
+        $$ = new comp_struct();
+        $$->comp = "=="; 
+    }
+| 
+    NEQ { 
+        printf("comp -> NEQ\n");
+        $$ = new comp_struct();
+        $$->comp = "!="; 
+    }
+| 
+    LT { 
+        printf("comp -> LT\n");
+        $$ = new comp_struct();
+        $$->comp = "<"; 
+    }
+| 
+    GT { 
+        printf("comp -> GT\n");
+        $$ = new comp_struct();
+        $$->comp = ">"; 
+    }
+| 
+    LTE { 
+        printf("comp -> LTE\n");
+        $$ = new comp_struct();
+        $$->comp = ""; 
+    }
+| 
+    GTE { 
+        printf("comp -> GTE\n");
+        $$ = new comp_struct();
+        $$->comp = ""; 
+    }
 ;
 
 expression: 
@@ -725,12 +785,10 @@ void yyerror(const char* msg) {
   printf("** Line %d, position %d: %s\n", currLine, currPos, msg);
 }
 
+/* Temp Manager Methods */
+
 int TempManager::tempGen() {
     return nextTempID++;
-}
-
-int TempManager::getTopTempID() {
-    return nextTempID - 1;
 }
 
 string TempManager::getTemp(int id) {
@@ -738,3 +796,16 @@ string TempManager::getTemp(int id) {
     ss << id;
     return "__temp__" + ss.str();
 }
+
+/* Label Manager Methods */
+
+int LabelManager::labelGen() {
+    return nextLabelID++;
+}
+
+std::string LabelManager::getLabel(int id) {
+    std::stringstream ss;
+    ss << id;
+    return "__label__" + ss.str();
+}
+
