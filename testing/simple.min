@@ -3,15 +3,22 @@ beginparams
 endparams
 beginlocals
 	r : integer;
-	a : array[4] of integer;
+	a : array[5] of integer;
 endlocals
 beginbody
-	read a[0], r, a[3];
-##    a[1] := 4 + 1 * 9 - 27 % 7 / 2 + 90;
+	read a[0], r, a[4];
+	a[0] := a[0];
+	a[1] := 4 + 1 * 9 - 27 % 7 / 2 + 90;
+	a[2] := 2 * a[1];
+	a[3] := a[2] + a[1];
+	write a[0], a[1], a[2], a[3], a[4], r;
+endbody
+
+
+##	a[0] := a[0] - r;
+##	a[1] := 4 + 1 * 9 - 27 % 7 / 2 + 90;
 ##	a[2] := a[0] + a[1];
 ##	a[3] := a[2] % 50;
-	write a[0], r, a[3];
-##	write a[1];
+##	write a[0], r, a[1];
 ##	write a[2];
-##	write a[3];
-endbody
+##	write a[3], a[4];

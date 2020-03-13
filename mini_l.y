@@ -43,6 +43,7 @@
   };
   struct dec_help_struct {
       std::string code;
+      std::queue<std::string> identList;
   };
   struct array_size_struct {
       std::string code;
@@ -267,10 +268,19 @@ declaration:
         printf("declaration -> dec_help COLON array_size INTEGER\n"); 
         $$ = new declaration_struct;
         std::ostringstream oss;
+        std::string identCode;
         if ($3->code.empty()) {
-            oss << ". " << $1->code << std::endl;
+            while (! $1->identList.empty()) {
+            identCode = $1->identList.front();
+            $1->identList.pop();
+                oss << ". " << identCode << std::endl;
+            }
         } else {
-            oss << ".[] " << $1->code << $3->code << std::endl;
+            while (! $1->identList.empty()) {
+            identCode = $1->identList.front();
+            $1->identList.pop();
+                oss << ".[] " << identCode << $3->code << std::endl;
+            }
         }
         $$->code = oss.str();
         delete $1;
@@ -283,6 +293,8 @@ dec_help:
         printf("dec_help -> ident\n");
         $$ = new dec_help_struct;
         std::ostringstream oss;
+        std::string identCode = $1->code;
+        $$->identList.push(identCode);
         oss << $1->code;
         $$->code = oss.str();
         delete $1;
@@ -292,7 +304,14 @@ dec_help:
         printf("dec_help -> ident comma_indent\n"); 
         $$ = new dec_help_struct;
         std::ostringstream oss;
-        oss << $1->code << $3->code;
+        std::string identCode = $1->code;
+        $$->identList.push(identCode);
+        while (! $3->identList.empty()) {
+            identCode = $3->identList.front();
+            $3->identList.pop();
+            $$->identList.push(identCode);
+        }
+        oss << $1->code << ", " << $3->code;
         $$->code = oss.str();
         delete $1;
         delete $3;
@@ -321,9 +340,15 @@ statement:
         printf("statement -> var ASSIGN expression\n"); 
         $$ = new statement_struct;
         std::ostringstream oss;
+        const bool isVarArray = $1->isArray;
         int id = $3->result_id;
         oss << $3->code;
-        oss << "= " << $1->code << ", " << tm->getTemp(id) << std::endl;
+        if (isVarArray) {
+            oss << "[]= " << $1->code << ", " << tm->getTemp(id) << std::endl;
+        } else {
+            oss << "= " << $1->code << ", " << tm->getTemp(id) << std::endl;
+        }
+
         $$->code = oss.str();
         delete $1;
         delete $3;
@@ -398,16 +423,16 @@ var_list:
         printf("var_list -> var COMMA var_list\n");
         $$ = new var_list_struct;
         std::ostringstream oss;
+        std::pair<bool, std::string> vType;
         oss << $1->code << $3->code;
         $$->code = oss.str();
-        std::pair<bool, std::string> vType;
+        vType = std::make_pair($1->isArray, $1->code);
+        $$->varTypes.push(vType);
         while (! $3->varTypes.empty()) {
             vType = $3->varTypes.front();
             $3->varTypes.pop();
             $$->varTypes.push(vType);
         }
-        vType = std::make_pair($1->isArray, $1->code);
-        $$->varTypes.push(vType);
         delete $1; 
         delete $3;
     }
@@ -553,9 +578,14 @@ term_help:
         printf("term_help -> var\n"); 
         $$ = new term_help_struct;
         std::ostringstream oss;
+        const bool isVarArray = $1->isArray;
         $$->result_id = tm->tempGen();
         oss << ". " << tm->getTemp($$->result_id) << std::endl;
-        oss << "= " << tm->getTemp($$->result_id) << ", " << $1->code << std::endl;
+        if (isVarArray) {
+            oss << "=[] " << tm->getTemp($$->result_id) << ", " << $1->code << std::endl;
+        } else {
+            oss << "= " << tm->getTemp($$->result_id) << ", " << $1->code << std::endl;
+        }
         $$->code = oss.str();
         delete $1;
     }
