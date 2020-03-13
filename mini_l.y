@@ -602,6 +602,8 @@ term:
     SUB term_help { printf("term -> SUB term_help\n"); }
 | 
     ident L_PAREN term_ident R_PAREN { printf("term -> L_PAREN term_ident R_PAREN\n"); }
+|
+    ident L_PAREN R_PAREN { printf("term -> L_PAREN R_PAREN\n"); }
 ;
 
 term_help: 
@@ -625,12 +627,21 @@ term_help:
         delete $1;
     }
 | 
-    L_PAREN expression R_PAREN { printf("term_help -> L_PAREN expression R_PAREN\n"); }
+    L_PAREN expression R_PAREN { 
+        printf("term_help -> L_PAREN expression R_PAREN\n"); 
+        $$ = new term_help_struct();
+
+        $$->code = $2->code;
+        $$->result_id = $2->result_id;
+        $$->number = "";
+        delete $2;
+    }
 ;
 
-term_ident:  { printf("term_indent -> epsilon\n"); }
-    | expression { printf("term_ident -> expression\n"); }
-    | expression COMMA term_ident { printf("term_ident -> expression COMMA term_ident\n"); }
+term_ident:  
+    expression { printf("term_ident -> expression\n"); }
+| 
+    expression COMMA term_ident { printf("term_ident -> expression COMMA term_ident\n"); }
 ;
 
 var: 

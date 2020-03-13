@@ -18,25 +18,9 @@ dec_list -> epsilon
 declaration SEMICOLON dec_list
 declaration SEMICOLON dec_list
 declaration SEMICOLON dec_list
-ident -> IDENT a
-number -> NUMBER 0
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 ident -> IDENT r
 var -> ident
-ident -> IDENT a
-number -> NUMBER 4
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 var_list -> var
-var_list -> var COMMA var_list
-var_list -> var COMMA var_list
 statement -> READ var_list
 ident -> IDENT b
 number -> NUMBER 0
@@ -78,13 +62,6 @@ multiplicative_expr -> term
 expression -> multiplicative_expr
 statement -> var ASSIGN expression
 ident -> IDENT a
-number -> NUMBER 0
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-ident -> IDENT a
 ident -> IDENT b
 ident -> IDENT b
 ident -> IDENT b
@@ -109,24 +86,11 @@ term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
 ident -> IDENT r
 var -> ident
 term_help -> var
 term -> term_help
 multiplicative_expr -> term
-expression -> expression SUB multiplicative_expr
-statement -> var ASSIGN expression
-ident -> IDENT a
-number -> NUMBER 1
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 number -> NUMBER 4
 term_help -> number
 term -> term_help
@@ -159,30 +123,40 @@ term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> expression ADD multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term MULT multiplicative_expr
+expression -> multiplicative_expr
+statement -> var ASSIGN expression
 ident -> IDENT a
-ident -> IDENT b
 number -> NUMBER 1
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-ident -> IDENT b
-number -> NUMBER 0
+number -> NUMBER 4
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
+number -> NUMBER 2
+term_help -> number
 term -> term_help
-multiplicative_expr -> term MULT multiplicative_expr
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
+multiplicative_expr -> term
+expression -> expression SUB multiplicative_expr
+number -> NUMBER 1
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> expression ADD multiplicative_expr
+number -> NUMBER 3
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> expression SUB multiplicative_expr
+number -> NUMBER 5
+term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> expression ADD multiplicative_expr
@@ -194,28 +168,51 @@ term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-ident -> IDENT a
-number -> NUMBER 0
+number -> NUMBER 4
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
+number -> NUMBER 2
+term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
-ident -> IDENT a
 number -> NUMBER 1
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
+number -> NUMBER 3
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 5
+term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> expression ADD multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> expression SUB multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> expression ADD multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> expression SUB multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
 statement -> var ASSIGN expression
 ident -> IDENT a
 number -> NUMBER 3
@@ -224,8 +221,75 @@ term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
+number -> NUMBER 20
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 5
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> expression SUB multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+number -> NUMBER 7
+term_help -> number
+term -> term_help
+multiplicative_expr -> term MOD multiplicative_expr
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 8
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+number -> NUMBER 5
+term_help -> number
+term -> term_help
+multiplicative_expr -> term MOD multiplicative_expr
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 8
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+number -> NUMBER 6
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 2
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> expression SUB multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term DIV multiplicative_expr
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> expression SUB multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> expression ADD multiplicative_expr
+statement -> var ASSIGN expression
 ident -> IDENT a
 number -> NUMBER 2
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+ident -> IDENT b
+number -> NUMBER 0
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
@@ -234,8 +298,71 @@ var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 term_help -> var
 term -> term_help
 multiplicative_expr -> term
-number -> NUMBER 50
+expression -> multiplicative_expr
+ident -> IDENT b
+number -> NUMBER 0
 term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> expression ADD multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term MULT multiplicative_expr
+expression -> multiplicative_expr
+var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
+number -> NUMBER 10
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+statement -> var ASSIGN expression
+ident -> IDENT r
+var -> ident
+ident -> IDENT r
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+number -> NUMBER 8
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 2
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> expression SUB multiplicative_expr
+term_help -> L_PAREN expression R_PAREN
 term -> term_help
 multiplicative_expr -> term MOD multiplicative_expr
 expression -> multiplicative_expr
@@ -247,8 +374,6 @@ term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-ident -> IDENT r
-var -> ident
 ident -> IDENT a
 number -> NUMBER 1
 term_help -> number
@@ -256,10 +381,6 @@ term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-var_list -> var
-var_list -> var COMMA var_list
-var_list -> var COMMA var_list
-statement -> WRITE var_list
 ident -> IDENT a
 number -> NUMBER 2
 term_help -> number
@@ -267,8 +388,6 @@ term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-var_list -> var
-statement -> WRITE var_list
 ident -> IDENT a
 number -> NUMBER 3
 term_help -> number
@@ -277,52 +396,19 @@ multiplicative_expr -> term
 expression -> multiplicative_expr
 var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 ident -> IDENT a
-ident -> IDENT b
-number -> NUMBER 0
+number -> NUMBER 4
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-ident -> IDENT b
-number -> NUMBER 0
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> expression ADD multiplicative_expr
-ident -> IDENT b
-number -> NUMBER 0
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> expression ADD multiplicative_expr
-ident -> IDENT b
-number -> NUMBER 0
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> expression ADD multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
+ident -> IDENT r
+var -> ident
 var_list -> var
+var_list -> var COMMA var_list
+var_list -> var COMMA var_list
+var_list -> var COMMA var_list
+var_list -> var COMMA var_list
 var_list -> var COMMA var_list
 statement -> WRITE var_list
 sta_loop -> statement SEMICOLON
@@ -347,163 +433,157 @@ func main
 .[] a, 5
 .[] b, 3
 . __temp__2
-= __temp__2, 0
-. __temp__3
-=[] __temp__3, a, __temp__2
-. __temp__4
-= __temp__4, r
-. __temp__5
-= __temp__5, 4
-. __temp__6
-=[] __temp__6, a, __temp__5
-.[]< a, __temp__2
+= __temp__2, r
 .< r
-.[]< a, __temp__5
+. __temp__3
+= __temp__3, 0
+. __temp__4
+=[] __temp__4, b, __temp__3
+. __temp__5
+= __temp__5, 1
+[]= b, __temp__3, __temp__5
+. __temp__6
+= __temp__6, 1
 . __temp__7
-= __temp__7, 0
+=[] __temp__7, b, __temp__6
 . __temp__8
-=[] __temp__8, b, __temp__7
+= __temp__8, 0
+[]= b, __temp__6, __temp__8
 . __temp__9
-= __temp__9, 1
-[]= b, __temp__7, __temp__9
+= __temp__9, 2
 . __temp__10
-= __temp__10, 1
+=[] __temp__10, b, __temp__9
 . __temp__11
-=[] __temp__11, b, __temp__10
+= __temp__11, 0
+[]= b, __temp__9, __temp__11
 . __temp__12
-= __temp__12, 0
-[]= b, __temp__10, __temp__12
+= __temp__12, 2
 . __temp__13
-= __temp__13, 2
+=[] __temp__13, b, __temp__12
 . __temp__14
 =[] __temp__14, b, __temp__13
 . __temp__15
-= __temp__15, 0
-[]= b, __temp__13, __temp__15
+=[] __temp__15, b, __temp__14
 . __temp__16
-= __temp__16, 0
+=[] __temp__16, a, __temp__15
 . __temp__17
-=[] __temp__17, a, __temp__16
+= __temp__17, r
 . __temp__18
-= __temp__18, 2
+= __temp__18, 4
 . __temp__19
-=[] __temp__19, b, __temp__18
+= __temp__19, 1
 . __temp__20
-=[] __temp__20, b, __temp__19
+= __temp__20, 9
 . __temp__21
-=[] __temp__21, b, __temp__20
+* __temp__21, __temp__19, __temp__20
 . __temp__22
-=[] __temp__22, a, __temp__21
++ __temp__22, __temp__18, __temp__21
 . __temp__23
-= __temp__23, r
+= __temp__23, 27
 . __temp__24
-- __temp__24, __temp__22, __temp__23
-[]= a, __temp__16, __temp__24
+= __temp__24, 7
 . __temp__25
-= __temp__25, 1
+% __temp__25, __temp__23, __temp__24
 . __temp__26
-=[] __temp__26, a, __temp__25
+= __temp__26, 2
 . __temp__27
-= __temp__27, 4
+/ __temp__27, __temp__25, __temp__26
 . __temp__28
-= __temp__28, 1
+- __temp__28, __temp__22, __temp__27
 . __temp__29
-= __temp__29, 9
+= __temp__29, 90
 . __temp__30
-* __temp__30, __temp__28, __temp__29
++ __temp__30, __temp__28, __temp__29
 . __temp__31
-+ __temp__31, __temp__27, __temp__30
+* __temp__31, __temp__17, __temp__30
+[]= a, __temp__15, __temp__31
 . __temp__32
-= __temp__32, 27
+= __temp__32, 1
 . __temp__33
-= __temp__33, 7
+=[] __temp__33, a, __temp__32
 . __temp__34
-% __temp__34, __temp__32, __temp__33
+= __temp__34, 4
 . __temp__35
 = __temp__35, 2
 . __temp__36
-/ __temp__36, __temp__34, __temp__35
+- __temp__36, __temp__34, __temp__35
 . __temp__37
-- __temp__37, __temp__31, __temp__36
+= __temp__37, 1
 . __temp__38
-= __temp__38, 90
++ __temp__38, __temp__36, __temp__37
 . __temp__39
-+ __temp__39, __temp__37, __temp__38
+= __temp__39, 3
 . __temp__40
-= __temp__40, 1
+- __temp__40, __temp__38, __temp__39
 . __temp__41
-=[] __temp__41, b, __temp__40
+= __temp__41, 5
 . __temp__42
-= __temp__42, 0
++ __temp__42, __temp__40, __temp__41
+[]= a, __temp__32, __temp__42
 . __temp__43
-=[] __temp__43, b, __temp__42
+= __temp__43, 2
 . __temp__44
-* __temp__44, __temp__41, __temp__43
+=[] __temp__44, a, __temp__43
 . __temp__45
-=[] __temp__45, a, __temp__44
+= __temp__45, 4
 . __temp__46
-+ __temp__46, __temp__39, __temp__45
-[]= a, __temp__25, __temp__46
+= __temp__46, 2
 . __temp__47
-= __temp__47, 2
+= __temp__47, 1
 . __temp__48
-=[] __temp__48, a, __temp__47
+= __temp__48, 3
 . __temp__49
-= __temp__49, 0
+= __temp__49, 5
 . __temp__50
-=[] __temp__50, a, __temp__49
++ __temp__50, __temp__48, __temp__49
 . __temp__51
-= __temp__51, 1
+- __temp__51, __temp__47, __temp__50
 . __temp__52
-=[] __temp__52, a, __temp__51
++ __temp__52, __temp__46, __temp__51
 . __temp__53
-+ __temp__53, __temp__50, __temp__52
-[]= a, __temp__47, __temp__53
+- __temp__53, __temp__45, __temp__52
+[]= a, __temp__43, __temp__53
 . __temp__54
 = __temp__54, 3
 . __temp__55
 =[] __temp__55, a, __temp__54
 . __temp__56
-= __temp__56, 2
+= __temp__56, 20
 . __temp__57
-=[] __temp__57, a, __temp__56
+= __temp__57, 5
 . __temp__58
-= __temp__58, 50
+- __temp__58, __temp__56, __temp__57
 . __temp__59
-% __temp__59, __temp__57, __temp__58
-[]= a, __temp__54, __temp__59
+= __temp__59, 7
 . __temp__60
-= __temp__60, 0
+% __temp__60, __temp__58, __temp__59
 . __temp__61
-=[] __temp__61, a, __temp__60
+= __temp__61, 8
 . __temp__62
-= __temp__62, r
+= __temp__62, 5
 . __temp__63
-= __temp__63, 1
+% __temp__63, __temp__61, __temp__62
 . __temp__64
-=[] __temp__64, a, __temp__63
-.[]> a, __temp__60
-.> r
-.[]> a, __temp__63
+= __temp__64, 8
 . __temp__65
-= __temp__65, 2
+= __temp__65, 6
 . __temp__66
-=[] __temp__66, a, __temp__65
-.[]> a, __temp__65
+= __temp__66, 2
 . __temp__67
-= __temp__67, 3
+- __temp__67, __temp__65, __temp__66
 . __temp__68
-=[] __temp__68, a, __temp__67
+/ __temp__68, __temp__64, __temp__67
 . __temp__69
-= __temp__69, 0
+- __temp__69, __temp__63, __temp__68
 . __temp__70
-=[] __temp__70, b, __temp__69
++ __temp__70, __temp__60, __temp__69
+[]= a, __temp__54, __temp__70
 . __temp__71
-= __temp__71, 0
+= __temp__71, 2
 . __temp__72
-=[] __temp__72, b, __temp__71
+= __temp__72, 0
 . __temp__73
-+ __temp__73, __temp__70, __temp__72
+=[] __temp__73, b, __temp__72
 . __temp__74
 = __temp__74, 0
 . __temp__75
@@ -511,15 +591,53 @@ func main
 . __temp__76
 + __temp__76, __temp__73, __temp__75
 . __temp__77
-= __temp__77, 0
+* __temp__77, __temp__71, __temp__76
 . __temp__78
-=[] __temp__78, b, __temp__77
+=[] __temp__78, a, __temp__77
 . __temp__79
-+ __temp__79, __temp__76, __temp__78
+= __temp__79, 10
+[]= a, __temp__77, __temp__79
 . __temp__80
-=[] __temp__80, a, __temp__79
-.[]> a, __temp__67
-.[]> a, __temp__79
+= __temp__80, r
+. __temp__81
+= __temp__81, r
+. __temp__82
+= __temp__82, 8
+. __temp__83
+= __temp__83, 2
+. __temp__84
+- __temp__84, __temp__82, __temp__83
+. __temp__85
+% __temp__85, __temp__81, __temp__84
+= r, __temp__85
+. __temp__86
+= __temp__86, 0
+. __temp__87
+=[] __temp__87, a, __temp__86
+. __temp__88
+= __temp__88, 1
+. __temp__89
+=[] __temp__89, a, __temp__88
+. __temp__90
+= __temp__90, 2
+. __temp__91
+=[] __temp__91, a, __temp__90
+. __temp__92
+= __temp__92, 3
+. __temp__93
+=[] __temp__93, a, __temp__92
+. __temp__94
+= __temp__94, 4
+. __temp__95
+=[] __temp__95, a, __temp__94
+. __temp__96
+= __temp__96, r
+.[]> a, __temp__86
+.[]> a, __temp__88
+.[]> a, __temp__90
+.[]> a, __temp__92
+.[]> a, __temp__94
+.> r
 endfunc
 
 
