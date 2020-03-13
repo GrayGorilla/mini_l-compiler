@@ -485,6 +485,9 @@ expression:
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "+ " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
         $$->code = oss.str();
+        if ($1->value.empty()) {
+            $$->value = "";
+        } else { $$->value = $1->value; }
         delete $1;
         delete $3;
     }
@@ -498,6 +501,9 @@ expression:
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "- " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
         $$->code = oss.str();
+        if ($1->value.empty()) {
+            $$->value = "";
+        } else { $$->value = $1->value; }
         delete $1;
         delete $3;
     }
@@ -524,6 +530,9 @@ multiplicative_expr:
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "/ " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
         $$->code = oss.str();
+        if ($1->value.empty()) {
+            $$->value = "";
+        } else { $$->value = $1->value; }
         delete $1;
         delete $3;
 
@@ -538,6 +547,9 @@ multiplicative_expr:
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "% " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
         $$->code = oss.str();
+        if ($1->value.empty()) {
+            $$->value = "";
+        } else { $$->value = $1->value; }
         delete $1;
         delete $3;        
     }
@@ -551,6 +563,9 @@ multiplicative_expr:
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "* " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
         $$->code = oss.str();
+        if ($1->value.empty()) {
+            $$->value = "";
+        } else { $$->value = $1->value; }
         delete $1;
         delete $3;
     }
