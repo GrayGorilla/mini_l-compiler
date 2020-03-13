@@ -584,13 +584,13 @@ comp:
     LTE { 
         printf("comp -> LTE\n");
         $$ = new comp_struct();
-        $$->comp = ""; 
+        $$->comp = "<="; 
     }
 | 
     GTE { 
         printf("comp -> GTE\n");
         $$ = new comp_struct();
-        $$->comp = ""; 
+        $$->comp = ">="; 
     }
 ;
 

@@ -16,7 +16,7 @@ beginbody	## main program
   k := 0;
   n := 20;
   
-  if i == j then
+  if i <= j then
     write n;
   else
     write k;

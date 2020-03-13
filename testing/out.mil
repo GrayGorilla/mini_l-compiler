@@ -44,7 +44,7 @@ term_help -> var
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
-comp -> EQ
+comp -> LTE
 ident -> IDENT j
 var -> ident
 term_help -> var
@@ -103,7 +103,7 @@ func main
 . __temp__7
 = __temp__7, j
 . __temp__8
-== __temp__8, __temp__6, __temp__7
+<= __temp__8, __temp__6, __temp__7
 ?:= __label__0, __temp__8
 := __label__1
 : __label__0
