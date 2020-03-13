@@ -8,6 +8,7 @@
   #include <utility>
   #include <queue>
 
+
   class TempManager {
     private:
         int nextTempID;
@@ -21,10 +22,10 @@
   extern int currLine;
   extern int currPos;
   extern FILE* yyin;
+  const int NOT_ARRAY = -1;
   TempManager* tm;
   int yylex();
   void yyerror(const char* msg);
-
 
   struct program_struct {
       std::string code;
@@ -56,7 +57,7 @@
   };
   struct var_list_struct {
       std::string code;
-      std::queue<std::pair<bool, std::string>> varTypes;
+      std::queue<std::pair<std::string, int>> varTypes;
   };
   struct bool_expr {
       std::string code;
@@ -79,40 +80,39 @@
   };
   struct expression_struct {
       std::string code;
-      std::string value;
+      std::string number;
       int result_id;
   };
   struct multiplicative_expr_struct {
       std::string code;
-      std::string value;
+      std::string number;
       int result_id;
   };
-    struct term_struct {
+  struct term_struct {
       std::string code;
-      std::string value;
+      std::string number;
       int result_id;
   };
   struct term_help_struct {
       std::string code;
-      std::string value;
+      std::string number;
       int result_id;
   };
   struct term_ident_struct {
       std::string code;
-      int result_id;
   };
   struct var_struct {
       std::string code;
+      std::string ident;
       int result_id;
-      bool isArray;
+      int index_id;
   };
   struct ident_struct {
-      std::string code;
-      int result_id;
+      std::string ident;
   };
   struct number_struct {
       std::string code;
-      std::string value;
+      std::string number;
       int result_id;
   };
 %}
@@ -189,18 +189,20 @@
 program: 
     { 
         printf("program -> epsilon\n"); 
-        $$ = new program_struct;
+        $$ = new program_struct();
         $$->code = "";
     }
 | 
     function program { 
         printf("program -> function program\n"); 
-        $$ = new program_struct;
+        $$ = new program_struct();
         std::ostringstream oss;
+
         oss << $1->code << $2->code;
         $$->code = oss.str();
         delete $1;
         delete $2;
+
         std::cout << "\n-----------------------\n" << std::endl;
         std::cout << $$->code << std::endl;
         delete $$;
@@ -210,11 +212,13 @@ program:
 function: 
     FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY { 
         printf("function -> FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY\n"); 
-        $$ = new function_struct;
+        $$ = new function_struct();
         std::ostringstream oss;
-        oss << "func " << $2->code << std::endl;
+
+        oss << "func " << $2->ident << std::endl;
         oss << $5->code << $8->code << $11->code;
         oss << "endfunc\n" << std::endl;
+
         $$->code = oss.str();
         delete $2;
         delete $5;
@@ -226,15 +230,16 @@ function:
 dec_list: 
     { 
         printf("dec_list -> epsilon\n"); 
-        $$ = new dec_list_struct;
+        $$ = new dec_list_struct();
         $$->code = "";
 
     }
 | 
     declaration SEMICOLON dec_list { 
         printf("declaration SEMICOLON dec_list\n"); 
-        $$ = new dec_list_struct;
+        $$ = new dec_list_struct();
         std::ostringstream oss;
+
         oss << $1->code << $3->code;
         $$->code = oss.str();
         delete $1;
@@ -245,17 +250,18 @@ dec_list:
 sta_loop: 
     statement SEMICOLON { 
         printf("sta_loop -> statement SEMICOLON\n"); 
-        $$ = new sta_loop_struct;
+        $$ = new sta_loop_struct();
         std::ostringstream oss;
-        oss << $1->code;
-        $$->code = oss.str();
+
+        $$->code = $1->code;
         delete $1;
     }
 | 
     statement SEMICOLON sta_loop { 
         printf("sta_loop -> statement SEMICOLON sta_loop\n");
-        $$ = new sta_loop_struct;
+        $$ = new sta_loop_struct();
         std::ostringstream oss;
+
         oss << $1->code << $3->code;
         $$->code = oss.str(); 
         delete $1;
@@ -266,19 +272,22 @@ sta_loop:
 declaration: 
     dec_help COLON array_size INTEGER { 
         printf("declaration -> dec_help COLON array_size INTEGER\n"); 
-        $$ = new declaration_struct;
+        $$ = new declaration_struct();
         std::ostringstream oss;
         std::string identCode;
+
+        // Non-array declaration
         if ($3->code.empty()) {
             while (! $1->identList.empty()) {
-            identCode = $1->identList.front();
-            $1->identList.pop();
+                identCode = $1->identList.front();
+                $1->identList.pop();
                 oss << ". " << identCode << std::endl;
             }
+        // Array declaration
         } else {
             while (! $1->identList.empty()) {
-            identCode = $1->identList.front();
-            $1->identList.pop();
+                identCode = $1->identList.front();
+                $1->identList.pop();
                 oss << ".[] " << identCode << $3->code << std::endl;
             }
         }
@@ -291,28 +300,24 @@ declaration:
 dec_help: 
     ident { 
         printf("dec_help -> ident\n");
-        $$ = new dec_help_struct;
-        std::ostringstream oss;
-        std::string identCode = $1->code;
+        $$ = new dec_help_struct();
+        std::string identCode = $1->ident;
+        
         $$->identList.push(identCode);
-        oss << $1->code;
-        $$->code = oss.str();
         delete $1;
     }
 | 
     ident COMMA dec_help { 
         printf("dec_help -> ident comma_indent\n"); 
-        $$ = new dec_help_struct;
-        std::ostringstream oss;
-        std::string identCode = $1->code;
+        $$ = new dec_help_struct();
+        std::string identCode = $1->ident;
+
         $$->identList.push(identCode);
         while (! $3->identList.empty()) {
             identCode = $3->identList.front();
             $3->identList.pop();
             $$->identList.push(identCode);
         }
-        oss << $1->code << ", " << $3->code;
-        $$->code = oss.str();
         delete $1;
         delete $3;
     }
@@ -321,7 +326,7 @@ dec_help:
 array_size:  
     { 
         printf("array_size -> epsilon\n"); 
-        $$ = new array_size_struct;
+        $$ = new array_size_struct();
         $$->code = "";
     }
 | 
@@ -329,7 +334,8 @@ array_size:
         printf("array_size -> ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF\n"); 
         $$ = new array_size_struct();
         std::ostringstream oss;
-        oss << ", " << $3->value;
+
+        oss << ", " << $3->number;
         $$->code = oss.str();
         delete $3;
     }
@@ -338,17 +344,17 @@ array_size:
 statement: 
     var ASSIGN expression { 
         printf("statement -> var ASSIGN expression\n"); 
-        $$ = new statement_struct;
+        $$ = new statement_struct();
         std::ostringstream oss;
-        const bool isVarArray = $1->isArray;
-        int id = $3->result_id;
-        oss << $3->code;
-        if (isVarArray) {
-            oss << "[]= " << $1->code << ", " << tm->getTemp(id) << std::endl;
-        } else {
-            oss << "= " << $1->code << ", " << tm->getTemp(id) << std::endl;
-        }
+        const int exprResultID = $3->result_id;
+        const int indexID = $1->index_id;
 
+        oss << $1->code << $3->code;
+        if (indexID == NOT_ARRAY) {
+            oss << "= " << $1->ident << ", " << tm->getTemp(exprResultID) << std::endl;
+        } else {
+            oss << "[]= " << $1->ident << ", " << tm->getTemp(indexID) << ", " << tm->getTemp(exprResultID) << std::endl;
+        }
         $$->code = oss.str();
         delete $1;
         delete $3;
@@ -364,17 +370,23 @@ statement:
 | 
     READ var_list { 
         printf("statement -> READ var_list\n"); 
-        $$ = new statement_struct;
+        $$ = new statement_struct();
         std::ostringstream oss;
-        std::pair<bool, std::string> vType;
+        std::pair<std::string, int> vType;
+        std::string index;
+        oss << $2->code;
+
         // Pops all variable types off the queue and puts into MIL code
         while (! $2->varTypes.empty()) {
             vType = $2->varTypes.front();
             $2->varTypes.pop();
-            if (vType.first) {
-                oss << ".[]< " << vType.second << std::endl;
+            index = tm->getTemp(vType.second);
+            if (vType.second == NOT_ARRAY) {
+                // Non-Array Var
+                oss << ".< " << vType.first << std::endl;
             } else {
-                oss << ".< " << vType.second << std::endl;
+                // Array Var
+                oss << ".[]< " << vType.first << ", " << index << std::endl;
             }
         }
         $$->code = oss.str();
@@ -383,17 +395,23 @@ statement:
 | 
     WRITE var_list { 
         printf("statement -> WRITE var_list\n"); 
-        $$ = new statement_struct;
+        $$ = new statement_struct();
         std::ostringstream oss;
-        std::pair<bool, std::string> vType;
+        std::pair<std::string, int> vType;
+        std::string index;
+        oss << $2->code;
+
         // Pops all variable types off the queue and puts into MIL code
         while (! $2->varTypes.empty()) {
             vType = $2->varTypes.front();
             $2->varTypes.pop();
-            if (vType.first) {
-                oss << ".[]> " << vType.second << std::endl;
+            index = tm->getTemp(vType.second);
+            if (vType.second == NOT_ARRAY) {
+                // Non-Array Var
+                oss << ".> " << vType.first << std::endl;
             } else {
-                oss << ".> " << vType.second << std::endl;
+                // Array Var
+                oss << ".[]> " << vType.first << ", " << index << std::endl;
             }
         }
         $$->code = oss.str();
@@ -410,23 +428,24 @@ conditional: sta_loop { printf("conditional -> sta_loop \n"); }
 var_list: 
     var { 
         printf("var_list -> var\n"); 
-        $$ = new var_list_struct;
-        std::ostringstream oss;
-        oss << $1->code;
-        $$->code = oss.str();
-        std::pair<bool, std::string> vType($1->isArray, $1->code);
+        $$ = new var_list_struct();
+        std::pair<std::string, int> vType($1->ident, $1->index_id);
+        
+        $$->code = $1->code;
         $$->varTypes.push(vType);
         delete $1;
     }
 | 
     var COMMA var_list { 
         printf("var_list -> var COMMA var_list\n");
-        $$ = new var_list_struct;
+        $$ = new var_list_struct();
         std::ostringstream oss;
-        std::pair<bool, std::string> vType;
+        std::pair<std::string, int> vType;
+
         oss << $1->code << $3->code;
         $$->code = oss.str();
-        vType = std::make_pair($1->isArray, $1->code);
+
+        vType = std::make_pair($1->ident, $1->index_id);
         $$->varTypes.push(vType);
         while (! $3->varTypes.empty()) {
             vType = $3->varTypes.front();
@@ -467,43 +486,42 @@ comp: EQ { printf("comp -> EQ\n"); }
 expression: 
     multiplicative_expr { 
         printf("expression -> multiplicative_expr\n"); 
-        $$ = new expression_struct;
-        $$->result_id = $1->result_id;
+        $$ = new expression_struct();
+
         $$->code = $1->code;
-        if ($1->value.empty()) {
-            $$->value = "";
-        } else { $$->value = $1->value; }
+        $$->result_id = $1->result_id;
+        $$->number = $1->number; 
         delete $1;
     }
 | 
     expression ADD multiplicative_expr { 
         printf("expression -> expression ADD multiplicative_expr\n"); 
-        $$ = new expression_struct;
+        $$ = new expression_struct();
         std::ostringstream oss;
-        oss << $1->code << $3->code;
+        
         $$->result_id = tm->tempGen();
+        oss << $1->code << $3->code;
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "+ " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
+        
         $$->code = oss.str();
-        if ($1->value.empty()) {
-            $$->value = "";
-        } else { $$->value = $1->value; }
+        $$->number = $1->number; 
         delete $1;
         delete $3;
     }
 | 
     expression SUB multiplicative_expr { 
         printf("expression -> expression SUB multiplicative_expr\n"); 
-        $$ = new expression_struct;
+        $$ = new expression_struct();
         std::ostringstream oss;
-        oss << $1->code << $3->code;
+
         $$->result_id = tm->tempGen();
+        oss << $1->code << $3->code;
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "- " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
+
         $$->code = oss.str();
-        if ($1->value.empty()) {
-            $$->value = "";
-        } else { $$->value = $1->value; }
+        $$->number = $1->number; 
         delete $1;
         delete $3;
     }
@@ -512,27 +530,26 @@ expression:
 multiplicative_expr: 
     term { 
         printf("multiplicative_expr -> term\n"); 
-        $$ = new multiplicative_expr_struct;
-        $$->result_id = $1->result_id;
+        $$ = new multiplicative_expr_struct();
+        
         $$->code = $1->code;
-        if ($1->value.empty()) {
-            $$->value = "";
-        } else { $$->value = $1->value; }
+        $$->result_id = $1->result_id;
+        $$->number = $1->number; 
         delete $1;
     }
 | 
     multiplicative_expr DIV term { 
         printf("multiplicative_expr -> term DIV multiplicative_expr\n"); 
-        $$ = new multiplicative_expr_struct;
+        $$ = new multiplicative_expr_struct();
         std::ostringstream oss;
-        oss << $1->code << $3->code;
+
         $$->result_id = tm->tempGen();
+        oss << $1->code << $3->code;
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "/ " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
+        
         $$->code = oss.str();
-        if ($1->value.empty()) {
-            $$->value = "";
-        } else { $$->value = $1->value; }
+        $$->number = $1->number; 
         delete $1;
         delete $3;
 
@@ -540,32 +557,32 @@ multiplicative_expr:
 | 
     multiplicative_expr MOD term { 
         printf("multiplicative_expr -> term MOD multiplicative_expr\n"); 
-        $$ = new multiplicative_expr_struct;
+        $$ = new multiplicative_expr_struct();
         std::ostringstream oss;
-        oss << $1->code << $3->code;
+
         $$->result_id = tm->tempGen();
+        oss << $1->code << $3->code;
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "% " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
+        
         $$->code = oss.str();
-        if ($1->value.empty()) {
-            $$->value = "";
-        } else { $$->value = $1->value; }
+        $$->number = $1->number; 
         delete $1;
         delete $3;        
     }
 | 
     multiplicative_expr MULT term { 
         printf("multiplicative_expr -> term MULT multiplicative_expr\n"); 
-        $$ = new multiplicative_expr_struct;
+        $$ = new multiplicative_expr_struct();
         std::ostringstream oss;
-        oss << $1->code << $3->code;
+
         $$->result_id = tm->tempGen();
+        oss << $1->code << $3->code;
         oss << ". " << tm->getTemp($$->result_id) << std::endl; 
         oss << "* " << tm->getTemp($$->result_id) << ", " << tm->getTemp($1->result_id) << ", " << tm->getTemp($3->result_id) << std::endl;
+        
         $$->code = oss.str();
-        if ($1->value.empty()) {
-            $$->value = "";
-        } else { $$->value = $1->value; }
+        $$->number = $1->number; 
         delete $1;
         delete $3;
     }
@@ -574,12 +591,11 @@ multiplicative_expr:
 term: 
     term_help { 
         printf("term -> term_help\n"); 
-        $$ = new term_struct;
+        $$ = new term_struct();
+
         $$->result_id = $1->result_id;
         $$->code = $1->code;
-        if ($1->value.empty()) {
-            $$->value = "";
-        } else { $$->value = $1->value; }
+        $$->number = $1->number; 
         delete $1;
     }
 | 
@@ -591,26 +607,21 @@ term:
 term_help: 
     var { 
         printf("term_help -> var\n"); 
-        $$ = new term_help_struct;
-        std::ostringstream oss;
-        const bool isVarArray = $1->isArray;
-        $$->result_id = tm->tempGen();
-        oss << ". " << tm->getTemp($$->result_id) << std::endl;
-        if (isVarArray) {
-            oss << "=[] " << tm->getTemp($$->result_id) << ", " << $1->code << std::endl;
-        } else {
-            oss << "= " << tm->getTemp($$->result_id) << ", " << $1->code << std::endl;
-        }
-        $$->code = oss.str();
+        $$ = new term_help_struct();
+
+        $$->code = $1->code;
+        $$->result_id = $1->result_id;
+        $$->number = "";
         delete $1;
     }
 | 
     number { 
         printf("term_help -> number\n"); 
-        $$ = new term_help_struct;
-        $$->result_id = $1->result_id;
+        $$ = new term_help_struct();
+
         $$->code = $1->code;
-        $$->value = $1->value;
+        $$->result_id = $1->result_id;
+        $$->number = $1->number;
         delete $1;
     }
 | 
@@ -625,19 +636,33 @@ term_ident:  { printf("term_indent -> epsilon\n"); }
 var: 
     ident { 
         printf("var -> ident\n"); 
-        $$ = new var_struct;
-        $$->code = $1->code;
-        $$->isArray = false;
+        $$ = new var_struct();
+        std::ostringstream oss;
+
+        $$->result_id = tm->tempGen();
+        oss << ". " << tm->getTemp($$->result_id) << std::endl;
+        oss << "= " << tm->getTemp($$->result_id) << ", " << $1->ident << std::endl;
+        
+        $$->code = oss.str();
+        $$->ident = $1->ident;
+        $$->index_id = NOT_ARRAY;
         delete $1;
     }
 | 
     ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET { 
         printf("var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n"); 
-        $$ = new var_struct;
+        $$ = new var_struct();
         std::ostringstream oss;
-        oss << $1->code << ", " << $3->value;
+        const int exprResultID = $3->result_id;
+
+        $$->result_id = tm->tempGen();
+        oss << $3->code;
+        oss << ". " << tm->getTemp($$->result_id) << std::endl;
+        oss << "=[] " << tm->getTemp($$->result_id) << ", " << $1->ident << ", " << tm->getTemp(exprResultID) << std::endl;
+        
         $$->code = oss.str();
-        $$->isArray = true;
+        $$->ident = $1->ident;
+        $$->index_id = exprResultID;
         delete $1;
         delete $3;
     }
@@ -646,23 +671,25 @@ var:
 ident: 
     IDENT { 
         printf("ident -> IDENT %s\n", $1); 
-        $$ = new ident_struct;
-        $$->code = $1;
+        $$ = new ident_struct();
+        $$->ident = $1;
     }
 ;
 
 number: 
     NUMBER { 
         printf("number -> NUMBER %d\n", $1); 
-        $$ = new number_struct;
+        $$ = new number_struct();
         std::ostringstream oss;
         std::stringstream ss;
+
         $$->result_id = tm->tempGen();
         oss << ". " << tm->getTemp($$->result_id) << std::endl;
         oss << "= " << tm->getTemp($$->result_id) << ", " << $1 << std::endl;
         ss << $1;
+
         $$->code = oss.str();
-        $$->value = ss.str();
+        $$->number = ss.str();
     }
 ;
 
