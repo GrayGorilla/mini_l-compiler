@@ -16,7 +16,6 @@
     public:
         TempManager() : nextTempID(0) {}
         int tempGen();
-        int getTopTempID();
         string getTemp(int id);
   };
 
@@ -66,12 +65,13 @@
   };
   struct conditional_struct {
       string code;
+      int result_id;
   };
   struct var_list_struct {
       string code;
       queue<pair<string, int>> varTypes;
   };
-  struct bool_expr {
+  struct bool_expr_struct {
       string code;
       int result_id;
   };
@@ -372,7 +372,26 @@ statement:
         delete $3;
     }
 | 
-    IF bool_expr THEN conditional ENDIF { printf("statement -> bool_expr conditional\n"); }
+    IF bool_expr THEN conditional ENDIF { 
+        printf("statement -> bool_expr conditional\n"); 
+        $$ = new statement_struct();
+        ostringstream oss;
+
+        int trueID = lm->labelGen();
+        int falseID = lm->labelGen();
+        int boolExprID = $2->result_id;
+        string trueLabel = lm->getLabel(trueID);
+        string falseLabel = lm->getLabel(falseID);
+
+        oss << $2->code;
+        oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprID) << endl;
+        oss << ":= " << falseLabel << endl;
+
+        oss << ": " << trueLabel << endl;
+        oss << $4->code;
+        oss << ": " << falseLabel << endl;
+        $$->code = oss.str();
+    }
 | 
     WHILE bool_expr BEGINLOOP sta_loop ENDLOOP { printf("statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP\n"); }
 | 
@@ -469,22 +488,53 @@ var_list:
     }
 ;
 
-bool_expr: relation_and_expr { printf("bool_expr -> relation_and_expr\n"); }
-    | relation_and_expr OR relation_and_expr { printf("bool_expr -> relation_and_expr OR relation_and_expr\n"); }
+bool_expr: 
+    relation_and_expr { 
+        printf("bool_expr -> relation_and_expr\n"); 
+        $$ = new bool_expr_struct();
+        $$->code = $1->code;
+        $$->result_id = $1->result_id;
+    }
+| 
+    relation_and_expr OR relation_and_expr { printf("bool_expr -> relation_and_expr OR relation_and_expr\n"); }
 ;
 
-relation_and_expr: relation_expr { printf("relation_and_expr -> relation_expr\n"); }
-    | relation_expr AND relation_and_expr { printf("relation_and_expr -> relation_expr AND relation_and_expr\n"); }
+relation_and_expr: 
+    relation_expr { 
+        printf("relation_and_expr -> relation_expr\n"); 
+        $$ = new relation_and_expr_struct();
+        $$->code = $1->code;
+        $$->result_id = $1->result_id;
+    }
+| 
+    relation_expr AND relation_and_expr { printf("relation_and_expr -> relation_expr AND relation_and_expr\n"); }
 ;
 
-relation_expr: relation_expr_help { printf("relation_expr -> relation_expr_help\n"); }
-    | NOT relation_expr_help { printf("relation_expr -> NOT relation_expr_help\n"); }
+relation_expr: 
+    relation_expr_help { 
+        printf("relation_expr -> relation_expr_help\n"); 
+        $$ = new relation_expr_struct();
+        $$->code = $1->code;
+        $$->result_id = $1->result_id;
+    }
+| 
+    NOT relation_expr_help { printf("relation_expr -> NOT relation_expr_help\n"); }
 ;
 
 relation_expr_help: 
     expression comp expression { 
         printf("relation_expr_help -> expression comp expression\n"); 
         $$ = new relation_expr_help_struct();
+        ostringstream oss;
+        int frontExprID = $1->result_id;
+        int backExprID = $3->result_id;
+
+        $$->result_id = tm->tempGen();
+        oss << $1->code << $3->code;
+        oss << ". " << tm->getTemp($$->result_id) << endl;
+
+        oss << $2->comp << " " << tm->getTemp($$->result_id) << ", " << tm->getTemp(frontExprID) << ", " << tm->getTemp(backExprID) << endl;
+        $$->code = oss.str();
     }
 | 
     TRUE { 
@@ -776,6 +826,7 @@ int main(int argc, char** argv) {
     }
   }
   tm = new TempManager();
+  lm = new LabelManager();
   yyparse();  // Calls yylex() for tokens
   delete tm;
   return 0;
