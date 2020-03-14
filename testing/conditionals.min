@@ -4,22 +4,25 @@ endparams
 
 beginlocals
 
-  n : integer;
+  m, n: integer;
   i, j, k: integer;
 
 endlocals
 
 beginbody	## main program
 
-  read i, j;
+  read m, n;
 
-  k := 0;
-  n := 20;
+  i := 1;
+  j := 0;
+  k := 999;
   
-  if i <= j then
-    write n;
+  if m <> n then
+    write i;
   else
-    write k;
+    write j;
   endif;
+
+  write k;
 
 endbody

@@ -65,7 +65,8 @@
   };
   struct conditional_struct {
       string code;
-      int result_id;
+      int true_id;
+      int false_id;
   };
   struct var_list_struct {
       string code;
@@ -263,7 +264,6 @@ sta_loop:
     statement SEMICOLON { 
         printf("sta_loop -> statement SEMICOLON\n"); 
         $$ = new sta_loop_struct();
-        ostringstream oss;
 
         $$->code = $1->code;
         delete $1;
@@ -377,8 +377,8 @@ statement:
         $$ = new statement_struct();
         ostringstream oss;
 
-        int trueID = lm->labelGen();
-        int falseID = lm->labelGen();
+        int trueID = $4->true_id;
+        int falseID = $4->false_id;
         int boolExprID = $2->result_id;
         string trueLabel = lm->getLabel(trueID);
         string falseLabel = lm->getLabel(falseID);
@@ -387,9 +387,7 @@ statement:
         oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprID) << endl;
         oss << ":= " << falseLabel << endl;
 
-        oss << ": " << trueLabel << endl;
         oss << $4->code;
-        oss << ": " << falseLabel << endl;
         $$->code = oss.str();
     }
 | 
@@ -452,8 +450,53 @@ statement:
     | RETURN expression { printf("statement -> RETURN expression\n"); }
 ;
 
-conditional: sta_loop { printf("conditional -> sta_loop \n"); }
-    | sta_loop ELSE sta_loop { printf("conditional -> sta_loop ELSE sta_loop\n"); }
+conditional: 
+    sta_loop { 
+        printf("conditional -> sta_loop \n"); 
+        $$ = new conditional_struct();
+        ostringstream oss;
+
+        int ifID = lm->labelGen();
+        int breakID = lm->labelGen();
+
+        string ifLabel = lm->getLabel(ifID);
+        string breakLabel = lm->getLabel(breakID);
+
+        oss << ": " << ifLabel << endl;
+        oss << $1->code;
+        
+        oss << ": " << breakLabel << endl;
+
+        $$->true_id = ifID;
+        $$->false_id = breakID;
+        $$->code = oss.str();
+    }
+| 
+    sta_loop ELSE sta_loop { 
+        printf("conditional -> sta_loop ELSE sta_loop\n"); 
+        $$ = new conditional_struct();
+        ostringstream oss;
+
+        int ifID = lm->labelGen();
+        int elseID = lm->labelGen();
+        int breakID = lm->labelGen();
+
+        string ifLabel = lm->getLabel(ifID);
+        string elseLabel = lm->getLabel(elseID);
+        string breakLabel = lm->getLabel(breakID);
+
+        oss << ": " << ifLabel << endl;
+        oss << $1->code;
+        oss << ":= " << breakLabel << endl;
+
+        oss << ": " << elseLabel << endl;
+        oss << $3->code;
+        oss << ": " << breakLabel << endl;
+
+        $$->true_id = ifID;
+        $$->false_id = elseID;
+        $$->code = oss.str();
+    }
 ;
 
 var_list: 

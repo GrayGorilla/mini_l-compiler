@@ -1,7 +1,9 @@
 ident -> IDENT main
 dec_list -> epsilon
+ident -> IDENT m
 ident -> IDENT n
 dec_help -> ident
+dec_help -> ident comma_indent
 array_size -> epsilon
 declaration -> dec_help COLON array_size INTEGER
 ident -> IDENT i
@@ -15,14 +17,22 @@ declaration -> dec_help COLON array_size INTEGER
 dec_list -> epsilon
 declaration SEMICOLON dec_list
 declaration SEMICOLON dec_list
-ident -> IDENT i
+ident -> IDENT m
 var -> ident
-ident -> IDENT j
+ident -> IDENT n
 var -> ident
 var_list -> var
 var_list -> var COMMA var_list
 statement -> READ var_list
-ident -> IDENT k
+ident -> IDENT i
+var -> ident
+number -> NUMBER 1
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+statement -> var ASSIGN expression
+ident -> IDENT j
 var -> ident
 number -> NUMBER 0
 term_help -> number
@@ -30,22 +40,22 @@ term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 statement -> var ASSIGN expression
-ident -> IDENT n
+ident -> IDENT k
 var -> ident
-number -> NUMBER 20
+number -> NUMBER 999
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
 statement -> var ASSIGN expression
-ident -> IDENT i
+ident -> IDENT m
 var -> ident
 term_help -> var
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
-comp -> LTE
-ident -> IDENT j
+comp -> NEQ
+ident -> IDENT n
 var -> ident
 term_help -> var
 term -> term_help
@@ -55,19 +65,25 @@ relation_expr_help -> expression comp expression
 relation_expr -> relation_expr_help
 relation_and_expr -> relation_expr
 bool_expr -> relation_and_expr
-ident -> IDENT n
+ident -> IDENT i
 var -> ident
 var_list -> var
 statement -> WRITE var_list
 sta_loop -> statement SEMICOLON
-ident -> IDENT k
+ident -> IDENT j
 var -> ident
 var_list -> var
 statement -> WRITE var_list
 sta_loop -> statement SEMICOLON
 conditional -> sta_loop ELSE sta_loop
 statement -> bool_expr conditional
+ident -> IDENT k
+var -> ident
+var_list -> var
+statement -> WRITE var_list
 sta_loop -> statement SEMICOLON
+sta_loop -> statement SEMICOLON sta_loop
+sta_loop -> statement SEMICOLON sta_loop
 sta_loop -> statement SEMICOLON sta_loop
 sta_loop -> statement SEMICOLON sta_loop
 sta_loop -> statement SEMICOLON sta_loop
@@ -78,39 +94,53 @@ program -> function program
 -----------------------
 
 func main
+. m
 . n
 . i
 . j
 . k
 . __temp__0
-= __temp__0, i
+= __temp__0, m
 . __temp__1
-= __temp__1, j
-.< i
-.< j
+= __temp__1, n
+.< m
+.< n
 . __temp__2
-= __temp__2, k
+= __temp__2, i
 . __temp__3
-= __temp__3, 0
-= k, __temp__3
+= __temp__3, 1
+= i, __temp__3
 . __temp__4
-= __temp__4, n
+= __temp__4, j
 . __temp__5
-= __temp__5, 20
-= n, __temp__5
+= __temp__5, 0
+= j, __temp__5
 . __temp__6
-= __temp__6, i
+= __temp__6, k
 . __temp__7
-= __temp__7, j
+= __temp__7, 999
+= k, __temp__7
 . __temp__8
-<= __temp__8, __temp__6, __temp__7
-?:= __label__0, __temp__8
-:= __label__1
-: __label__0
+= __temp__8, m
 . __temp__9
 = __temp__9, n
-.> n
+. __temp__10
+!= __temp__10, __temp__8, __temp__9
+?:= __label__0, __temp__10
+:= __label__1
+: __label__0
+. __temp__11
+= __temp__11, i
+.> i
+:= __label__2
 : __label__1
+. __temp__12
+= __temp__12, j
+.> j
+: __label__2
+. __temp__13
+= __temp__13, k
+.> k
 endfunc
 
 
