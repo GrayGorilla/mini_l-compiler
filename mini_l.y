@@ -379,13 +379,13 @@ statement:
 
         int trueID = $4->true_id;
         int falseID = $4->false_id;
-        int boolExprID = $2->result_id;
+        int boolExprResultID = $2->result_id;
 
         string trueLabel = lm->getLabel(trueID);
         string falseLabel = lm->getLabel(falseID);
 
         oss << $2->code;
-        oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprID) << endl;
+        oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprResultID) << endl;
         oss << ":= " << falseLabel << endl;
 
         oss << $4->code;
@@ -400,7 +400,7 @@ statement:
         int loopID = lm->labelGen();
         int trueID = lm->labelGen();
         int falseID = lm->labelGen();
-        int boolExprID = $2->result_id;
+        int boolExprResultID = $2->result_id;
 
         string loopLabel = lm->getLabel(loopID);
         string trueLabel = lm->getLabel(trueID);
@@ -408,12 +408,12 @@ statement:
 
         oss << ": " << loopLabel << endl;
         oss << $2->code;
-        oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprID) << endl;
+        oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprResultID) << endl;
         oss << ":= " << falseLabel << endl;
 
         oss << ": " << trueLabel << endl;
         oss << $4->code;
-        oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprID) << endl;
+        oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
 
         oss << ": " << falseLabel << endl;
         $$->code = oss.str();
@@ -425,7 +425,7 @@ statement:
         ostringstream oss;
 
         int loopID = lm->labelGen();
-        int boolExprID = $6->result_id;
+        int boolExprResultID = $6->result_id;
         string loopLabel = lm->getLabel(loopID);
 
         oss << ": " << loopLabel << endl;
@@ -433,12 +433,40 @@ statement:
         oss << $6->code;
         oss << $3->code;
 
-        oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprID) << endl;
+        oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
         $$->code = oss.str();
 
     }
 | 
-    FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP { printf("statement -> FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP\n"); }
+    FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP { 
+        printf("statement -> FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP\n"); 
+        $$ = new statement_struct();
+        ostringstream oss;
+
+        int loopID = lm->labelGen();
+        int trueID = lm->labelGen();
+        int falseID = lm->labelGen();
+        int boolExprResultID = $6->result_id;
+        int exprResultID = $10->result_id;
+
+        string loopLabel = lm->getLabel(loopID);
+        string trueLabel = lm->getLabel(trueID);
+        string falseLabel = lm->getLabel(falseID);
+
+        oss << "= " << $2->ident << ", " << $4->number << endl;
+        oss << ": " << loopLabel << endl;
+        oss << $6->code;
+        oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprResultID) << endl;
+        oss << ":= " << falseLabel << endl;
+
+        oss << ": " << trueLabel << endl;
+        oss << $12->code << $10->code;
+        oss << "= " << $8->ident << ", " << tm->getTemp(exprResultID) << endl;
+        oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
+
+        oss << ": " << falseLabel << endl;
+        $$->code = oss.str();
+    }
 | 
     READ var_list { 
         printf("statement -> READ var_list\n"); 
@@ -489,8 +517,10 @@ statement:
         $$->code = oss.str();
         delete $2;
     }
-    | CONTINUE { printf("statement -> CONTINUE\n"); }
-    | RETURN expression { printf("statement -> RETURN expression\n"); }
+| 
+    CONTINUE { printf("statement -> CONTINUE\n"); }
+| 
+    RETURN expression { printf("statement -> RETURN expression\n"); }
 ;
 
 conditional: 

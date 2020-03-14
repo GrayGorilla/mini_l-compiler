@@ -17,6 +17,7 @@ beginbody	## main program
   j := 0;
   k := 99999;
   
+  ## Conditional
   if m <> n then
     write i;
   else
@@ -26,21 +27,30 @@ beginbody	## main program
   write k;
   m := 0;
 
+  ## While Loop
   while m <= n beginloop
     write m;
-    m := m + 1;
+    m := m + 2;
   endloop;
 
   write k;
   read m;
   n := 0;
 
+  ## Do While Loop
   do beginloop
     write m;
     m := m - 1;
   endloop while m > n;
 
   write k;
+  read n;
+  
+  ## For Loop
+  for i := 0; i < n; i := i + 1 beginloop
+    write i;
+  endloop;
+
 
 
 endbody
