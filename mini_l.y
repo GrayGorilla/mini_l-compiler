@@ -380,6 +380,7 @@ statement:
         int trueID = $4->true_id;
         int falseID = $4->false_id;
         int boolExprID = $2->result_id;
+
         string trueLabel = lm->getLabel(trueID);
         string falseLabel = lm->getLabel(falseID);
 
@@ -391,7 +392,33 @@ statement:
         $$->code = oss.str();
     }
 | 
-    WHILE bool_expr BEGINLOOP sta_loop ENDLOOP { printf("statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP\n"); }
+    WHILE bool_expr BEGINLOOP sta_loop ENDLOOP { 
+        printf("statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP\n"); 
+        $$ = new statement_struct();
+        ostringstream oss;
+
+        int loopID = lm->labelGen();
+        int trueID = lm->labelGen();
+        int falseID = lm->labelGen();
+        int boolExprID = $2->result_id;
+
+        string loopLabel = lm->getLabel(loopID);
+        string trueLabel = lm->getLabel(trueID);
+        string falseLabel = lm->getLabel(falseID);
+
+        oss << ": " << loopLabel << endl;
+        oss << $2->code;
+        oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprID) << endl;
+        oss << ":= " << falseLabel << endl;
+
+        oss << ": " << trueLabel << endl;
+        oss << $4->code;
+        oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprID) << endl;
+
+        oss << ": " << falseLabel << endl;
+        $$->code = oss.str();
+
+    }
 | 
     DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr { printf("statement -> DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr\n"); }
 | 

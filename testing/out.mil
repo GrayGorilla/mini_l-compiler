@@ -42,7 +42,7 @@ expression -> multiplicative_expr
 statement -> var ASSIGN expression
 ident -> IDENT k
 var -> ident
-number -> NUMBER 999
+number -> NUMBER 99999
 term_help -> number
 term -> term_help
 multiplicative_expr -> term
@@ -81,7 +81,60 @@ ident -> IDENT k
 var -> ident
 var_list -> var
 statement -> WRITE var_list
+ident -> IDENT m
+var -> ident
+number -> NUMBER 0
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+statement -> var ASSIGN expression
+ident -> IDENT m
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+comp -> LTE
+ident -> IDENT n
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+relation_expr_help -> expression comp expression
+relation_expr -> relation_expr_help
+relation_and_expr -> relation_expr
+bool_expr -> relation_and_expr
+ident -> IDENT m
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+ident -> IDENT m
+var -> ident
+ident -> IDENT m
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 1
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> expression ADD multiplicative_expr
+statement -> var ASSIGN expression
 sta_loop -> statement SEMICOLON
+sta_loop -> statement SEMICOLON sta_loop
+statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP
+ident -> IDENT k
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+sta_loop -> statement SEMICOLON
+sta_loop -> statement SEMICOLON sta_loop
+sta_loop -> statement SEMICOLON sta_loop
+sta_loop -> statement SEMICOLON sta_loop
 sta_loop -> statement SEMICOLON sta_loop
 sta_loop -> statement SEMICOLON sta_loop
 sta_loop -> statement SEMICOLON sta_loop
@@ -118,7 +171,7 @@ func main
 . __temp__6
 = __temp__6, k
 . __temp__7
-= __temp__7, 999
+= __temp__7, 99999
 = k, __temp__7
 . __temp__8
 = __temp__8, m
@@ -140,6 +193,38 @@ func main
 : __label__2
 . __temp__13
 = __temp__13, k
+.> k
+. __temp__14
+= __temp__14, m
+. __temp__15
+= __temp__15, 0
+= m, __temp__15
+: __label__3
+. __temp__16
+= __temp__16, m
+. __temp__17
+= __temp__17, n
+. __temp__18
+<= __temp__18, __temp__16, __temp__17
+?:= __label__4, __temp__18
+:= __label__5
+: __label__4
+. __temp__19
+= __temp__19, m
+.> m
+. __temp__20
+= __temp__20, m
+. __temp__21
+= __temp__21, m
+. __temp__22
+= __temp__22, 1
+. __temp__23
++ __temp__23, __temp__21, __temp__22
+= m, __temp__23
+?:= __label__3, __temp__18
+: __label__5
+. __temp__24
+= __temp__24, k
 .> k
 endfunc
 

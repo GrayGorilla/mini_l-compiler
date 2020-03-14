@@ -15,7 +15,7 @@ beginbody	## main program
 
   i := 1;
   j := 0;
-  k := 999;
+  k := 99999;
   
   if m <> n then
     write i;
@@ -24,5 +24,14 @@ beginbody	## main program
   endif;
 
   write k;
+  m := 0;
+
+  while m <= n beginloop
+    write m;
+    m := m + 1;
+  endloop;
+
+  write k;
+
 
 endbody
