@@ -201,13 +201,11 @@
 
 program: 
     { 
-        printf("program -> epsilon\n"); 
         $$ = new program_struct();
         $$->code = "";
     }
 | 
     function program { 
-        printf("program -> function program\n"); 
         $$ = new program_struct();
         ostringstream oss;
 
@@ -216,7 +214,6 @@ program:
         delete $1;
         delete $2;
 
-        cout << "\n-----------------------\n" << endl;
         cout << $$->code << endl;
         delete $$;
     }
@@ -224,7 +221,6 @@ program:
 
 function: 
     FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY { 
-        printf("function -> FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY\n"); 
         $$ = new function_struct();
         ostringstream oss;
 
@@ -242,14 +238,11 @@ function:
 
 dec_list: 
     { 
-        printf("dec_list -> epsilon\n"); 
         $$ = new dec_list_struct();
         $$->code = "";
-
     }
 | 
     declaration SEMICOLON dec_list { 
-        printf("declaration SEMICOLON dec_list\n"); 
         $$ = new dec_list_struct();
         ostringstream oss;
 
@@ -262,7 +255,6 @@ dec_list:
 
 sta_loop: 
     statement SEMICOLON { 
-        printf("sta_loop -> statement SEMICOLON\n"); 
         $$ = new sta_loop_struct();
 
         $$->code = $1->code;
@@ -270,7 +262,6 @@ sta_loop:
     }
 | 
     statement SEMICOLON sta_loop { 
-        printf("sta_loop -> statement SEMICOLON sta_loop\n");
         $$ = new sta_loop_struct();
         ostringstream oss;
 
@@ -283,7 +274,6 @@ sta_loop:
 
 declaration: 
     dec_help COLON array_size INTEGER { 
-        printf("declaration -> dec_help COLON array_size INTEGER\n"); 
         $$ = new declaration_struct();
         ostringstream oss;
         string identCode;
@@ -311,7 +301,6 @@ declaration:
 
 dec_help: 
     ident { 
-        printf("dec_help -> ident\n");
         $$ = new dec_help_struct();
         string identCode = $1->ident;
         
@@ -320,7 +309,6 @@ dec_help:
     }
 | 
     ident COMMA dec_help { 
-        printf("dec_help -> ident comma_indent\n"); 
         $$ = new dec_help_struct();
         string identCode = $1->ident;
 
@@ -337,13 +325,11 @@ dec_help:
 
 array_size:  
     { 
-        printf("array_size -> epsilon\n"); 
         $$ = new array_size_struct();
         $$->code = "";
     }
 | 
     ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF { 
-        printf("array_size -> ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF\n"); 
         $$ = new array_size_struct();
         ostringstream oss;
 
@@ -355,7 +341,6 @@ array_size:
 
 statement: 
     var ASSIGN expression { 
-        printf("statement -> var ASSIGN expression\n"); 
         $$ = new statement_struct();
         ostringstream oss;
         const int exprResultID = $3->result_id;
@@ -373,7 +358,6 @@ statement:
     }
 | 
     IF bool_expr THEN conditional ENDIF { 
-        printf("statement -> bool_expr conditional\n"); 
         $$ = new statement_struct();
         ostringstream oss;
 
@@ -393,7 +377,6 @@ statement:
     }
 | 
     WHILE bool_expr BEGINLOOP sta_loop ENDLOOP { 
-        printf("statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP\n"); 
         $$ = new statement_struct();
         ostringstream oss;
 
@@ -420,7 +403,6 @@ statement:
     }
 | 
     DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr { 
-        printf("statement -> DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr\n"); 
         $$ = new statement_struct();
         ostringstream oss;
 
@@ -429,9 +411,9 @@ statement:
         string loopLabel = lm->getLabel(loopID);
 
         oss << ": " << loopLabel << endl;
-        // Check bool_expr before executing sta_loop code
-        oss << $6->code;
+        // Run sta_loop code before checking bool_expr
         oss << $3->code;
+        oss << $6->code;
 
         oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
         $$->code = oss.str();
@@ -439,7 +421,6 @@ statement:
     }
 | 
     FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP { 
-        printf("statement -> FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP\n"); 
         $$ = new statement_struct();
         ostringstream oss;
 
@@ -469,7 +450,6 @@ statement:
     }
 | 
     READ var_list { 
-        printf("statement -> READ var_list\n"); 
         $$ = new statement_struct();
         ostringstream oss;
         pair<string, int> vType;
@@ -494,7 +474,6 @@ statement:
     }
 | 
     WRITE var_list { 
-        printf("statement -> WRITE var_list\n"); 
         $$ = new statement_struct();
         ostringstream oss;
         pair<string, int> vType;
@@ -518,14 +497,19 @@ statement:
         delete $2;
     }
 | 
-    CONTINUE { printf("statement -> CONTINUE\n"); }
+    CONTINUE {}
 | 
-    RETURN expression { printf("statement -> RETURN expression\n"); }
+    RETURN expression { 
+        $$ = new statement_struct();
+        ostringstream oss;
+        oss << $2->code;
+        oss << "ret " << tm->getTemp($2->result_id) << endl;
+        $$->code = oss.str();
+    }
 ;
 
 conditional: 
     sta_loop { 
-        printf("conditional -> sta_loop \n"); 
         $$ = new conditional_struct();
         ostringstream oss;
 
@@ -546,7 +530,6 @@ conditional:
     }
 | 
     sta_loop ELSE sta_loop { 
-        printf("conditional -> sta_loop ELSE sta_loop\n"); 
         $$ = new conditional_struct();
         ostringstream oss;
 
@@ -574,7 +557,6 @@ conditional:
 
 var_list: 
     var { 
-        printf("var_list -> var\n"); 
         $$ = new var_list_struct();
         pair<string, int> vType($1->ident, $1->index_id);
         
@@ -584,7 +566,6 @@ var_list:
     }
 | 
     var COMMA var_list { 
-        printf("var_list -> var COMMA var_list\n");
         $$ = new var_list_struct();
         ostringstream oss;
         pair<string, int> vType;
@@ -606,40 +587,67 @@ var_list:
 
 bool_expr: 
     relation_and_expr { 
-        printf("bool_expr -> relation_and_expr\n"); 
         $$ = new bool_expr_struct();
         $$->code = $1->code;
         $$->result_id = $1->result_id;
     }
 | 
-    relation_and_expr OR relation_and_expr { printf("bool_expr -> relation_and_expr OR relation_and_expr\n"); }
+    relation_and_expr OR relation_and_expr { 
+        $$ = new bool_expr_struct();
+        ostringstream oss;
+        int aResultID = $1->result_id;
+        int bResultID = $3->result_id;
+
+        $$->result_id = tm->tempGen();
+        oss << $1->code << $3->code;
+        oss << ". " << tm->getTemp($$->result_id) << endl;
+        oss << "|| " << tm->getTemp($$->result_id) << ", " << tm->getTemp(aResultID) << ", " << tm->getTemp(bResultID) << endl;
+        $$->code = oss.str();
+
+    }
 ;
 
 relation_and_expr: 
     relation_expr { 
-        printf("relation_and_expr -> relation_expr\n"); 
         $$ = new relation_and_expr_struct();
         $$->code = $1->code;
         $$->result_id = $1->result_id;
     }
 | 
-    relation_expr AND relation_and_expr { printf("relation_and_expr -> relation_expr AND relation_and_expr\n"); }
+    relation_expr AND relation_and_expr { 
+        $$ = new relation_and_expr_struct();
+        ostringstream oss;
+        int aResultID = $1->result_id;
+        int bResultID = $3->result_id;
+
+        $$->result_id = tm->tempGen();
+        oss << $1->code << $3->code;
+        oss << ". " << tm->getTemp($$->result_id) << endl;
+        oss << "&& " << tm->getTemp($$->result_id) << ", " << tm->getTemp(aResultID) << ", " << tm->getTemp(bResultID) << endl;
+        $$->code = oss.str();
+    }
 ;
 
 relation_expr: 
     relation_expr_help { 
-        printf("relation_expr -> relation_expr_help\n"); 
         $$ = new relation_expr_struct();
         $$->code = $1->code;
         $$->result_id = $1->result_id;
     }
 | 
-    NOT relation_expr_help { printf("relation_expr -> NOT relation_expr_help\n"); }
+    NOT relation_expr_help { 
+        $$ = new relation_expr_struct();
+        ostringstream oss;
+
+        $$->result_id = $2->result_id;
+        oss << $2->code;
+        oss << "! " << tm->getTemp($$->result_id) << ", " << tm->getTemp($$->result_id) << endl;
+        $$->code = oss.str();
+    }
 ;
 
 relation_expr_help: 
     expression comp expression { 
-        printf("relation_expr_help -> expression comp expression\n"); 
         $$ = new relation_expr_help_struct();
         ostringstream oss;
         int frontExprID = $1->result_id;
@@ -654,7 +662,6 @@ relation_expr_help:
     }
 | 
     TRUE { 
-        printf("relation_expr_help -> TRUE\n"); 
         $$ = new relation_expr_help_struct();
         ostringstream oss;
         
@@ -666,7 +673,6 @@ relation_expr_help:
     }
 | 
     FALSE { 
-        printf("relation_expr_help -> FALSE\n"); 
         $$ = new relation_expr_help_struct();
         ostringstream oss;
         
@@ -678,7 +684,6 @@ relation_expr_help:
     }
 | 
     L_PAREN bool_expr R_PAREN { 
-        printf("relation_expr_help -> L_PAREN bool_expr R_PAREN\n"); 
         $$ = new relation_expr_help_struct();
         $$->code = $2->code;
         $$->result_id = $2->result_id;
@@ -687,37 +692,31 @@ relation_expr_help:
 
 comp: 
     EQ { 
-        printf("comp -> EQ\n");
         $$ = new comp_struct();
         $$->comp = "=="; 
     }
 | 
     NEQ { 
-        printf("comp -> NEQ\n");
         $$ = new comp_struct();
         $$->comp = "!="; 
     }
 | 
     LT { 
-        printf("comp -> LT\n");
         $$ = new comp_struct();
         $$->comp = "<"; 
     }
 | 
     GT { 
-        printf("comp -> GT\n");
         $$ = new comp_struct();
         $$->comp = ">"; 
     }
 | 
     LTE { 
-        printf("comp -> LTE\n");
         $$ = new comp_struct();
         $$->comp = "<="; 
     }
 | 
     GTE { 
-        printf("comp -> GTE\n");
         $$ = new comp_struct();
         $$->comp = ">="; 
     }
@@ -725,7 +724,6 @@ comp:
 
 expression: 
     multiplicative_expr { 
-        printf("expression -> multiplicative_expr\n"); 
         $$ = new expression_struct();
 
         $$->code = $1->code;
@@ -735,7 +733,6 @@ expression:
     }
 | 
     expression ADD multiplicative_expr { 
-        printf("expression -> expression ADD multiplicative_expr\n"); 
         $$ = new expression_struct();
         ostringstream oss;
         
@@ -751,7 +748,6 @@ expression:
     }
 | 
     expression SUB multiplicative_expr { 
-        printf("expression -> expression SUB multiplicative_expr\n"); 
         $$ = new expression_struct();
         ostringstream oss;
 
@@ -769,7 +765,6 @@ expression:
 
 multiplicative_expr: 
     term { 
-        printf("multiplicative_expr -> term\n"); 
         $$ = new multiplicative_expr_struct();
         
         $$->code = $1->code;
@@ -779,7 +774,6 @@ multiplicative_expr:
     }
 | 
     multiplicative_expr DIV term { 
-        printf("multiplicative_expr -> term DIV multiplicative_expr\n"); 
         $$ = new multiplicative_expr_struct();
         ostringstream oss;
 
@@ -796,7 +790,6 @@ multiplicative_expr:
     }
 | 
     multiplicative_expr MOD term { 
-        printf("multiplicative_expr -> term MOD multiplicative_expr\n"); 
         $$ = new multiplicative_expr_struct();
         ostringstream oss;
 
@@ -812,7 +805,6 @@ multiplicative_expr:
     }
 | 
     multiplicative_expr MULT term { 
-        printf("multiplicative_expr -> term MULT multiplicative_expr\n"); 
         $$ = new multiplicative_expr_struct();
         ostringstream oss;
 
@@ -830,9 +822,7 @@ multiplicative_expr:
 
 term: 
     term_help { 
-        printf("term -> term_help\n"); 
         $$ = new term_struct();
-
         $$->result_id = $1->result_id;
         $$->code = $1->code;
         $$->number = $1->number; 
@@ -840,7 +830,6 @@ term:
     }
 | 
     SUB term_help { 
-        printf("term -> SUB term_help\n"); 
         $$ = new term_struct();
         ostringstream oss;
         int termHelpReultID = $2->result_id;
@@ -862,9 +851,7 @@ term:
 
 term_help: 
     var { 
-        printf("term_help -> var\n"); 
         $$ = new term_help_struct();
-
         $$->code = $1->code;
         $$->result_id = $1->result_id;
         $$->number = "";
@@ -872,9 +859,7 @@ term_help:
     }
 | 
     number { 
-        printf("term_help -> number\n"); 
         $$ = new term_help_struct();
-
         $$->code = $1->code;
         $$->result_id = $1->result_id;
         $$->number = $1->number;
@@ -882,9 +867,7 @@ term_help:
     }
 | 
     L_PAREN expression R_PAREN { 
-        printf("term_help -> L_PAREN expression R_PAREN\n"); 
         $$ = new term_help_struct();
-
         $$->code = $2->code;
         $$->result_id = $2->result_id;
         $$->number = "";
@@ -893,14 +876,13 @@ term_help:
 ;
 
 term_ident:  
-    expression { printf("term_ident -> expression\n"); }
+    expression {}
 | 
-    expression COMMA term_ident { printf("term_ident -> expression COMMA term_ident\n"); }
+    expression COMMA term_ident {}
 ;
 
 var: 
     ident { 
-        printf("var -> ident\n"); 
         $$ = new var_struct();
         ostringstream oss;
 
@@ -915,7 +897,6 @@ var:
     }
 | 
     ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET { 
-        printf("var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n"); 
         $$ = new var_struct();
         ostringstream oss;
         const int exprResultID = $3->result_id;
@@ -935,7 +916,6 @@ var:
 
 ident: 
     IDENT { 
-        printf("ident -> IDENT %s\n", $1); 
         $$ = new ident_struct();
         $$->ident = $1;
     }
@@ -943,7 +923,6 @@ ident:
 
 number: 
     NUMBER { 
-        printf("number -> NUMBER %d\n", $1); 
         $$ = new number_struct();
         ostringstream oss;
         stringstream ss;

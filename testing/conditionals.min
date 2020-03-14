@@ -18,7 +18,7 @@ beginbody	## main program
   k := 99999;
   
   ## Conditional
-  if (((m <> n))) then
+  if (((m == n))) then
     write i;
   else
     write j;
