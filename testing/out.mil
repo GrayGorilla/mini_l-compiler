@@ -1,45 +1,181 @@
 ident -> IDENT main
 dec_list -> epsilon
+ident -> IDENT m
 ident -> IDENT n
-dec_help -> ident
-array_size -> epsilon
-declaration -> dec_help COLON array_size INTEGER
-ident -> IDENT a
-dec_help -> ident
-number -> NUMBER 1000
-array_size -> ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF
-declaration -> dec_help COLON array_size INTEGER
-ident -> IDENT i
-ident -> IDENT j
 dec_help -> ident
 dec_help -> ident comma_indent
 array_size -> epsilon
 declaration -> dec_help COLON array_size INTEGER
-ident -> IDENT x
-ident -> IDENT sqrt_n
+ident -> IDENT i
+ident -> IDENT j
+ident -> IDENT k
 dec_help -> ident
+dec_help -> ident comma_indent
 dec_help -> ident comma_indent
 array_size -> epsilon
 declaration -> dec_help COLON array_size INTEGER
 dec_list -> epsilon
 declaration SEMICOLON dec_list
 declaration SEMICOLON dec_list
-declaration SEMICOLON dec_list
-declaration SEMICOLON dec_list
+ident -> IDENT m
+var -> ident
 ident -> IDENT n
 var -> ident
 var_list -> var
+var_list -> var COMMA var_list
 statement -> READ var_list
-ident -> IDENT x
+ident -> IDENT i
 var -> ident
+number -> NUMBER 1
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+statement -> var ASSIGN expression
+ident -> IDENT j
+var -> ident
+number -> NUMBER 0
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+statement -> var ASSIGN expression
+ident -> IDENT k
+var -> ident
+number -> NUMBER 99999
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+statement -> var ASSIGN expression
+ident -> IDENT m
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+comp -> NEQ
 ident -> IDENT n
 var -> ident
 term_help -> var
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
+relation_expr_help -> expression comp expression
+relation_expr -> relation_expr_help
+relation_and_expr -> relation_expr
+bool_expr -> relation_and_expr
+relation_expr_help -> L_PAREN bool_expr R_PAREN
+relation_expr -> relation_expr_help
+relation_and_expr -> relation_expr
+bool_expr -> relation_and_expr
+relation_expr_help -> L_PAREN bool_expr R_PAREN
+relation_expr -> relation_expr_help
+relation_and_expr -> relation_expr
+bool_expr -> relation_and_expr
+relation_expr_help -> L_PAREN bool_expr R_PAREN
+relation_expr -> relation_expr_help
+relation_and_expr -> relation_expr
+bool_expr -> relation_and_expr
+ident -> IDENT i
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+sta_loop -> statement SEMICOLON
+ident -> IDENT j
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+sta_loop -> statement SEMICOLON
+conditional -> sta_loop ELSE sta_loop
+statement -> bool_expr conditional
+ident -> IDENT k
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+ident -> IDENT m
+var -> ident
+number -> NUMBER 0
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
 statement -> var ASSIGN expression
-ident -> IDENT x
+ident -> IDENT m
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+comp -> LTE
+ident -> IDENT n
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+relation_expr_help -> expression comp expression
+relation_expr -> relation_expr_help
+relation_and_expr -> relation_expr
+bool_expr -> relation_and_expr
+ident -> IDENT m
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+ident -> IDENT m
+var -> ident
+ident -> IDENT m
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 2
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> expression ADD multiplicative_expr
+statement -> var ASSIGN expression
+sta_loop -> statement SEMICOLON
+sta_loop -> statement SEMICOLON sta_loop
+statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP
+ident -> IDENT k
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+ident -> IDENT m
+var -> ident
+var_list -> var
+statement -> READ var_list
+ident -> IDENT n
+var -> ident
+number -> NUMBER 0
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+statement -> var ASSIGN expression
+ident -> IDENT m
+var -> ident
+var_list -> var
+statement -> WRITE var_list
+ident -> IDENT m
+var -> ident
+ident -> IDENT m
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+number -> NUMBER 1
+term_help -> number
+term -> term_help
+multiplicative_expr -> term
+expression -> expression SUB multiplicative_expr
+statement -> var ASSIGN expression
+sta_loop -> statement SEMICOLON
+sta_loop -> statement SEMICOLON sta_loop
+ident -> IDENT m
 var -> ident
 term_help -> var
 term -> term_help
@@ -51,94 +187,40 @@ var -> ident
 term_help -> var
 term -> term_help
 multiplicative_expr -> term
-ident -> IDENT x
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term DIV multiplicative_expr
 expression -> multiplicative_expr
 relation_expr_help -> expression comp expression
 relation_expr -> relation_expr_help
 relation_and_expr -> relation_expr
 bool_expr -> relation_and_expr
-ident -> IDENT x
+statement -> DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr
+ident -> IDENT k
 var -> ident
-ident -> IDENT x
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
+var_list -> var
+statement -> WRITE var_list
 ident -> IDENT n
 var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-ident -> IDENT x
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term DIV multiplicative_expr
-expression -> expression ADD multiplicative_expr
-term_help -> L_PAREN expression R_PAREN
-term -> term_help
-multiplicative_expr -> term
-number -> NUMBER 2
-term_help -> number
-term -> term_help
-multiplicative_expr -> term DIV multiplicative_expr
-expression -> multiplicative_expr
-statement -> var ASSIGN expression
-sta_loop -> statement SEMICOLON
-statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP
-ident -> IDENT sqrt_n
-var -> ident
-ident -> IDENT x
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-statement -> var ASSIGN expression
+var_list -> var
+statement -> READ var_list
 ident -> IDENT i
 var -> ident
-number -> NUMBER 2
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-statement -> var ASSIGN expression
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-comp -> LTE
-ident -> IDENT n
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-relation_expr_help -> expression comp expression
-relation_expr -> relation_expr_help
-relation_and_expr -> relation_expr
-bool_expr -> relation_and_expr
-ident -> IDENT a
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 number -> NUMBER 0
-term_help -> number
+ident -> IDENT i
+var -> ident
+term_help -> var
 term -> term_help
 multiplicative_expr -> term
 expression -> multiplicative_expr
-statement -> var ASSIGN expression
+comp -> LT
+ident -> IDENT n
+var -> ident
+term_help -> var
+term -> term_help
+multiplicative_expr -> term
+expression -> multiplicative_expr
+relation_expr_help -> expression comp expression
+relation_expr -> relation_expr_help
+relation_and_expr -> relation_expr
+bool_expr -> relation_and_expr
 ident -> IDENT i
 var -> ident
 ident -> IDENT i
@@ -152,214 +234,18 @@ term_help -> number
 term -> term_help
 multiplicative_expr -> term
 expression -> expression ADD multiplicative_expr
-statement -> var ASSIGN expression
-sta_loop -> statement SEMICOLON
-sta_loop -> statement SEMICOLON sta_loop
-statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP
-ident -> IDENT i
-var -> ident
-number -> NUMBER 2
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-statement -> var ASSIGN expression
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-comp -> LTE
-ident -> IDENT sqrt_n
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-relation_expr_help -> expression comp expression
-relation_expr -> relation_expr_help
-relation_and_expr -> relation_expr
-bool_expr -> relation_and_expr
-ident -> IDENT a
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-comp -> EQ
-number -> NUMBER 0
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-relation_expr_help -> expression comp expression
-relation_expr -> relation_expr_help
-relation_and_expr -> relation_expr
-bool_expr -> relation_and_expr
-ident -> IDENT j
-var -> ident
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> expression ADD multiplicative_expr
-statement -> var ASSIGN expression
-ident -> IDENT j
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-comp -> LTE
-ident -> IDENT n
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-relation_expr_help -> expression comp expression
-relation_expr -> relation_expr_help
-relation_and_expr -> relation_expr
-bool_expr -> relation_and_expr
-ident -> IDENT a
-ident -> IDENT j
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-number -> NUMBER 1
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-statement -> var ASSIGN expression
-ident -> IDENT j
-var -> ident
-ident -> IDENT j
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> expression ADD multiplicative_expr
-statement -> var ASSIGN expression
-sta_loop -> statement SEMICOLON
-sta_loop -> statement SEMICOLON sta_loop
-statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP
-sta_loop -> statement SEMICOLON
-sta_loop -> statement SEMICOLON sta_loop
-conditional -> sta_loop 
-statement -> bool_expr conditional
-ident -> IDENT i
-var -> ident
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-number -> NUMBER 1
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> expression ADD multiplicative_expr
-statement -> var ASSIGN expression
-sta_loop -> statement SEMICOLON
-sta_loop -> statement SEMICOLON sta_loop
-statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP
-ident -> IDENT i
-var -> ident
-number -> NUMBER 2
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-statement -> var ASSIGN expression
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-comp -> LTE
-ident -> IDENT n
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-relation_expr_help -> expression comp expression
-relation_expr -> relation_expr_help
-relation_and_expr -> relation_expr
-bool_expr -> relation_and_expr
-ident -> IDENT a
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-comp -> EQ
-number -> NUMBER 0
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-relation_expr_help -> expression comp expression
-relation_expr -> relation_expr_help
-relation_and_expr -> relation_expr
-bool_expr -> relation_and_expr
 ident -> IDENT i
 var -> ident
 var_list -> var
 statement -> WRITE var_list
 sta_loop -> statement SEMICOLON
-conditional -> sta_loop 
-statement -> bool_expr conditional
-ident -> IDENT i
-var -> ident
-ident -> IDENT i
-var -> ident
-term_help -> var
-term -> term_help
-multiplicative_expr -> term
-expression -> multiplicative_expr
-number -> NUMBER 1
-term_help -> number
-term -> term_help
-multiplicative_expr -> term
-expression -> expression ADD multiplicative_expr
-statement -> var ASSIGN expression
+statement -> FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP
 sta_loop -> statement SEMICOLON
 sta_loop -> statement SEMICOLON sta_loop
-statement -> WHILE bool_expr BEGINLOOP sta_loop ENDLOOP
-sta_loop -> statement SEMICOLON
+sta_loop -> statement SEMICOLON sta_loop
+sta_loop -> statement SEMICOLON sta_loop
+sta_loop -> statement SEMICOLON sta_loop
+sta_loop -> statement SEMICOLON sta_loop
 sta_loop -> statement SEMICOLON sta_loop
 sta_loop -> statement SEMICOLON sta_loop
 sta_loop -> statement SEMICOLON sta_loop
@@ -376,207 +262,142 @@ program -> function program
 -----------------------
 
 func main
+. m
 . n
-.[] a, 1000
 . i
 . j
-. x
-. sqrt_n
+. k
+. __temp__0
+= __temp__0, m
 . __temp__1
 = __temp__1, n
+.< m
 .< n
 . __temp__2
-= __temp__2, x
+= __temp__2, i
 . __temp__3
-= __temp__3, n
-= x, __temp__3
-: __label__0
+= __temp__3, 1
+= i, __temp__3
 . __temp__4
-= __temp__4, x
+= __temp__4, j
 . __temp__5
-= __temp__5, n
+= __temp__5, 0
+= j, __temp__5
 . __temp__6
-= __temp__6, x
+= __temp__6, k
 . __temp__7
-/ __temp__7, __temp__5, __temp__6
+= __temp__7, 99999
+= k, __temp__7
 . __temp__8
-> __temp__8, __temp__4, __temp__7
-?:= __label__1, __temp__8
+= __temp__8, m
+. __temp__9
+= __temp__9, n
+. __temp__10
+!= __temp__10, __temp__8, __temp__9
+?:= __label__0, __temp__10
+:= __label__1
+: __label__0
+. __temp__11
+= __temp__11, i
+.> i
 := __label__2
 : __label__1
-. __temp__9
-= __temp__9, x
-. __temp__10
-= __temp__10, x
-. __temp__11
-= __temp__11, n
 . __temp__12
-= __temp__12, x
-. __temp__13
-/ __temp__13, __temp__11, __temp__12
-. __temp__14
-+ __temp__14, __temp__10, __temp__13
-. __temp__15
-= __temp__15, 2
-. __temp__16
-/ __temp__16, __temp__14, __temp__15
-= x, __temp__16
-?:= __label__0, __temp__8
+= __temp__12, j
+.> j
 : __label__2
-. __temp__17
-= __temp__17, sqrt_n
-. __temp__18
-= __temp__18, x
-= sqrt_n, __temp__18
-. __temp__19
-= __temp__19, i
-. __temp__20
-= __temp__20, 2
-= i, __temp__20
+. __temp__13
+= __temp__13, k
+.> k
+. __temp__14
+= __temp__14, m
+. __temp__15
+= __temp__15, 0
+= m, __temp__15
 : __label__3
-. __temp__21
-= __temp__21, i
-. __temp__22
-= __temp__22, n
-. __temp__23
-<= __temp__23, __temp__21, __temp__22
-?:= __label__4, __temp__23
+. __temp__16
+= __temp__16, m
+. __temp__17
+= __temp__17, n
+. __temp__18
+<= __temp__18, __temp__16, __temp__17
+?:= __label__4, __temp__18
 := __label__5
 : __label__4
-. __temp__24
-= __temp__24, i
-. __temp__25
-=[] __temp__25, a, __temp__24
-. __temp__26
-= __temp__26, 0
-[]= a, __temp__24, __temp__26
-. __temp__27
-= __temp__27, i
-. __temp__28
-= __temp__28, i
-. __temp__29
-= __temp__29, 1
-. __temp__30
-+ __temp__30, __temp__28, __temp__29
-= i, __temp__30
-?:= __label__3, __temp__23
+. __temp__19
+= __temp__19, m
+.> m
+. __temp__20
+= __temp__20, m
+. __temp__21
+= __temp__21, m
+. __temp__22
+= __temp__22, 2
+. __temp__23
++ __temp__23, __temp__21, __temp__22
+= m, __temp__23
+?:= __label__3, __temp__18
 : __label__5
-. __temp__31
-= __temp__31, i
-. __temp__32
-= __temp__32, 2
-= i, __temp__32
-: __label__11
-. __temp__33
-= __temp__33, i
-. __temp__34
-= __temp__34, sqrt_n
-. __temp__35
-<= __temp__35, __temp__33, __temp__34
-?:= __label__12, __temp__35
-:= __label__13
-: __label__12
-. __temp__36
-= __temp__36, i
-. __temp__37
-=[] __temp__37, a, __temp__36
-. __temp__38
-= __temp__38, 0
-. __temp__39
-== __temp__39, __temp__37, __temp__38
-?:= __label__9, __temp__39
-:= __label__10
-: __label__9
-. __temp__40
-= __temp__40, j
-. __temp__41
-= __temp__41, i
-. __temp__42
-= __temp__42, i
-. __temp__43
-+ __temp__43, __temp__41, __temp__42
-= j, __temp__43
+. __temp__24
+= __temp__24, k
+.> k
+. __temp__25
+= __temp__25, m
+.< m
+. __temp__26
+= __temp__26, n
+. __temp__27
+= __temp__27, 0
+= n, __temp__27
 : __label__6
-. __temp__44
-= __temp__44, j
-. __temp__45
-= __temp__45, n
-. __temp__46
-<= __temp__46, __temp__44, __temp__45
-?:= __label__7, __temp__46
-:= __label__8
+. __temp__33
+= __temp__33, m
+. __temp__34
+= __temp__34, n
+. __temp__35
+> __temp__35, __temp__33, __temp__34
+. __temp__28
+= __temp__28, m
+.> m
+. __temp__29
+= __temp__29, m
+. __temp__30
+= __temp__30, m
+. __temp__31
+= __temp__31, 1
+. __temp__32
+- __temp__32, __temp__30, __temp__31
+= m, __temp__32
+?:= __label__6, __temp__35
+. __temp__36
+= __temp__36, k
+.> k
+. __temp__37
+= __temp__37, n
+.< n
+= i, 0
 : __label__7
-. __temp__47
-= __temp__47, j
-. __temp__48
-=[] __temp__48, a, __temp__47
-. __temp__49
-= __temp__49, 1
-[]= a, __temp__47, __temp__49
-. __temp__50
-= __temp__50, j
-. __temp__51
-= __temp__51, j
-. __temp__52
-= __temp__52, i
-. __temp__53
-+ __temp__53, __temp__51, __temp__52
-= j, __temp__53
-?:= __label__6, __temp__46
+. __temp__40
+= __temp__40, i
+. __temp__41
+= __temp__41, n
+. __temp__42
+< __temp__42, __temp__40, __temp__41
+?:= __label__8, __temp__42
+:= __label__9
 : __label__8
-: __label__10
-. __temp__54
-= __temp__54, i
-. __temp__55
-= __temp__55, i
-. __temp__56
-= __temp__56, 1
-. __temp__57
-+ __temp__57, __temp__55, __temp__56
-= i, __temp__57
-?:= __label__11, __temp__35
-: __label__13
-. __temp__58
-= __temp__58, i
-. __temp__59
-= __temp__59, 2
-= i, __temp__59
-: __label__16
-. __temp__60
-= __temp__60, i
-. __temp__61
-= __temp__61, n
-. __temp__62
-<= __temp__62, __temp__60, __temp__61
-?:= __label__17, __temp__62
-:= __label__18
-: __label__17
-. __temp__63
-= __temp__63, i
-. __temp__64
-=[] __temp__64, a, __temp__63
-. __temp__65
-= __temp__65, 0
-. __temp__66
-== __temp__66, __temp__64, __temp__65
-?:= __label__14, __temp__66
-:= __label__15
-: __label__14
-. __temp__67
-= __temp__67, i
+. __temp__47
+= __temp__47, i
 .> i
-: __label__15
-. __temp__68
-= __temp__68, i
-. __temp__69
-= __temp__69, i
-. __temp__70
-= __temp__70, 1
-. __temp__71
-+ __temp__71, __temp__69, __temp__70
-= i, __temp__71
-?:= __label__16, __temp__62
-: __label__18
+. __temp__44
+= __temp__44, i
+. __temp__45
+= __temp__45, 1
+. __temp__46
++ __temp__46, __temp__44, __temp__45
+= i, __temp__46
+?:= __label__7, __temp__42
+: __label__9
 endfunc
 
 

@@ -21,6 +21,8 @@ beginbody
     write a[0], a[1], a[2], a[3], a[4], r;
 	x := 500 - (-500);									## 1000
 	write x;
+	x := -x;											## -1000
+	write x;
 endbody
 
 ##	a[0] := a[0];

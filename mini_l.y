@@ -656,19 +656,32 @@ relation_expr_help:
     TRUE { 
         printf("relation_expr_help -> TRUE\n"); 
         $$ = new relation_expr_help_struct();
-        // Write code here
+        ostringstream oss;
+        
+        $$->result_id = tm->tempGen();
+        oss << ". " << tm->getTemp($$->result_id) << endl;
+
+        oss << "= " << tm->getTemp($$->result_id) << ", 1" << endl;
+        $$->code = oss.str();
     }
 | 
     FALSE { 
         printf("relation_expr_help -> FALSE\n"); 
         $$ = new relation_expr_help_struct();
-        // Write code here
+        ostringstream oss;
+        
+        $$->result_id = tm->tempGen();
+        oss << ". " << tm->getTemp($$->result_id) << endl;
+
+        oss << "= " << tm->getTemp($$->result_id) << ", 0" << endl;
+        $$->code = oss.str();
     }
 | 
     L_PAREN bool_expr R_PAREN { 
         printf("relation_expr_help -> L_PAREN bool_expr R_PAREN\n"); 
         $$ = new relation_expr_help_struct();
-        // Write code here
+        $$->code = $2->code;
+        $$->result_id = $2->result_id;
     }
 ;
 
