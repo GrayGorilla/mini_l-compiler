@@ -417,10 +417,26 @@ statement:
 
         oss << ": " << falseLabel << endl;
         $$->code = oss.str();
-
     }
 | 
-    DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr { printf("statement -> DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr\n"); }
+    DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr { 
+        printf("statement -> DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr\n"); 
+        $$ = new statement_struct();
+        ostringstream oss;
+
+        int loopID = lm->labelGen();
+        int boolExprID = $6->result_id;
+        string loopLabel = lm->getLabel(loopID);
+
+        oss << ": " << loopLabel << endl;
+        // Check bool_expr before executing sta_loop code
+        oss << $6->code;
+        oss << $3->code;
+
+        oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprID) << endl;
+        $$->code = oss.str();
+
+    }
 | 
     FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP { printf("statement -> FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP\n"); }
 | 

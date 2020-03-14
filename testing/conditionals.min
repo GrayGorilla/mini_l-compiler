@@ -32,6 +32,15 @@ beginbody	## main program
   endloop;
 
   write k;
+  read m;
+  n := 0;
+
+  do beginloop
+    write m;
+    m := m - 1;
+  endloop while m > n;
+
+  write k;
 
 
 endbody
