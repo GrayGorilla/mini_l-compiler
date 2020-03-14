@@ -826,7 +826,21 @@ term:
         delete $1;
     }
 | 
-    SUB term_help { printf("term -> SUB term_help\n"); }
+    SUB term_help { 
+        printf("term -> SUB term_help\n"); 
+        $$ = new term_struct();
+        ostringstream oss;
+        int termHelpReultID = $2->result_id;
+
+        oss << $2->code;
+        oss << "- " << tm->getTemp(termHelpReultID) << ", 0, " << tm->getTemp(termHelpReultID) << endl;
+
+        $$->result_id = termHelpReultID;
+        if (! $2->number.empty()) {
+            $$->number = "-" + $2->number; 
+        }
+        $$->code = oss.str();
+    }
 | 
     ident L_PAREN term_ident R_PAREN { printf("term -> L_PAREN term_ident R_PAREN\n"); }
 |
@@ -975,4 +989,3 @@ std::string LabelManager::getLabel(int id) {
     ss << id;
     return "__label__" + ss.str();
 }
-
