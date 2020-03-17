@@ -196,7 +196,7 @@ func main
 = __temp__77, k
 .> k
 : __label__4
-:= __label__7, __temp__61
+:= __label__7
 : __label__9
 : __label__12
 . __temp__78

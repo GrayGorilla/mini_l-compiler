@@ -7,6 +7,7 @@
   #include <iostream>
   #include <utility>
   #include <queue>
+  #include <vector>
   using namespace std;
 
 
@@ -28,12 +29,10 @@
         std::string getLabel(int id);
   };
 
-
   extern int currLine;
   extern int currPos;
   extern FILE* yyin;
   const int NOT_ARRAY = -1;
-  const int INAVLID_ID = -1;
   TempManager* tm;
   LabelManager* lm;
   int yylex();
@@ -60,7 +59,7 @@
       queue<string> identList;
   };
   struct array_size_struct {
-      string code;
+      string array_size;
   };
   struct statement_struct {
       string code;
@@ -294,7 +293,7 @@ declaration:
         string identCode;
 
         // Non-array declaration
-        if ($3->code.empty()) {
+        if ($3->array_size.empty()) {
             while (! $1->identList.empty()) {
                 identCode = $1->identList.front();
                 $1->identList.pop();
@@ -305,7 +304,7 @@ declaration:
             while (! $1->identList.empty()) {
                 identCode = $1->identList.front();
                 $1->identList.pop();
-                oss << ".[] " << identCode << $3->code << endl;
+                oss << ".[] " << identCode << $3->array_size << endl;
             }
         }
         $$->code = oss.str();
@@ -319,6 +318,7 @@ dec_help:
         $$ = new dec_help_struct();
         string identCode = $1->ident;
         
+        // Put identifier into a queue
         $$->identList.push(identCode);
         delete $1;
     }
@@ -327,6 +327,7 @@ dec_help:
         $$ = new dec_help_struct();
         string identCode = $1->ident;
 
+        // Put all identifiers into a queue
         $$->identList.push(identCode);
         while (! $3->identList.empty()) {
             identCode = $3->identList.front();
@@ -341,7 +342,7 @@ dec_help:
 array_size:  
     { 
         $$ = new array_size_struct();
-        $$->code = "";
+        $$->array_size = "";
     }
 | 
     ARRAY L_SQUARE_BRACKET number R_SQUARE_BRACKET OF { 
@@ -349,7 +350,7 @@ array_size:
         ostringstream oss;
 
         oss << ", " << $3->number;
-        $$->code = oss.str();
+        $$->array_size = oss.str();
         delete $3;
     }
 ;
@@ -363,8 +364,10 @@ statement:
 
         oss << $1->code << $3->code;
         if (indexID == NOT_ARRAY) {
+            // Non-array var
             oss << "= " << $1->ident << ", " << tm->getTemp(exprResultID) << endl;
         } else {
+            // Array var
             oss << "[]= " << $1->ident << ", " << tm->getTemp(indexID) << ", " << tm->getTemp(exprResultID) << endl;
         }
         $$->code = oss.str();
@@ -383,6 +386,7 @@ statement:
         string trueLabel = lm->getLabel(trueID);
         string falseLabel = lm->getLabel(falseID);
 
+        // Check validity of if statement
         oss << $2->code;
         oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprResultID) << endl;
         oss << ":= " << falseLabel << endl;
@@ -425,7 +429,7 @@ statement:
             oss << ": " << lm->getLabel(continueIDs.at(i)) << endl;
         }
         // Loop back
-        oss << ":= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
+        oss << ":= " << loopLabel << endl;
         oss << ": " << falseLabel << endl;
 
         $$->code = oss.str();
@@ -493,7 +497,7 @@ statement:
         }
         // Increment/Decrement, then loop back
         oss << "= " << $8->ident << ", " << tm->getTemp(exprResultID) << endl;
-        oss << ":= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
+        oss << ":= " << loopLabel << endl;
 
         oss << ": " << falseLabel << endl;
         $$->code = oss.str();
@@ -518,10 +522,10 @@ statement:
             $2->varTypes.pop();
             index = tm->getTemp(vType.second);
             if (vType.second == NOT_ARRAY) {
-                // Non-Array Var
+                // Non-array var
                 oss << ".< " << vType.first << endl;
             } else {
-                // Array Var
+                // Array var
                 oss << ".[]< " << vType.first << ", " << index << endl;
             }
         }
@@ -542,10 +546,10 @@ statement:
             $2->varTypes.pop();
             index = tm->getTemp(vType.second);
             if (vType.second == NOT_ARRAY) {
-                // Non-Array Var
+                // Non-array var
                 oss << ".> " << vType.first << endl;
             } else {
-                // Array Var
+                // Array var
                 oss << ".[]> " << vType.first << ", " << index << endl;
             }
         }
@@ -586,9 +590,11 @@ conditional:
         string ifLabel = lm->getLabel(ifID);
         string breakLabel = lm->getLabel(breakID);
 
+        // Label for when if statement is true
         oss << ": " << ifLabel << endl;
         oss << $1->code;
         
+        // Label for when if statement is false
         oss << ": " << breakLabel << endl;
 
         $$->true_id = ifID;
@@ -612,10 +618,12 @@ conditional:
         vector<int> ifContinueIDs = $1->continue_ids;
         vector<int> elseContinueIDs = $3->continue_ids;
 
+        // Label for when if statement is true
         oss << ": " << ifLabel << endl;
         oss << $1->code;
         oss << ":= " << breakLabel << endl;
 
+        // Label for when if statment is false
         oss << ": " << elseLabel << endl;
         oss << $3->code;
         oss << ": " << breakLabel << endl;
@@ -640,6 +648,8 @@ var_list:
         $$ = new var_list_struct();
         pair<string, int> vType($1->ident, $1->index_id);
         
+        // Put all identifiers with their respective indecies to queue
+        // (Identifiers that are not arrays, have index = NOT_ARRAY = -1)
         $$->code = $1->code;
         $$->varTypes.push(vType);
         delete $1;
@@ -653,6 +663,8 @@ var_list:
         oss << $1->code << $3->code;
         $$->code = oss.str();
 
+        // Put all identifiers with their respective indecies to queue
+        // (Identifiers that are not arrays, have index = NOT_ARRAY = -1)
         vType = make_pair($1->ident, $1->index_id);
         $$->varTypes.push(vType);
         while (! $3->varTypes.empty()) {
@@ -979,7 +991,7 @@ var:
     ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET { 
         $$ = new var_struct();
         ostringstream oss;
-        const int exprResultID = $3->result_id;
+        int exprResultID = $3->result_id;
 
         $$->result_id = tm->tempGen();
         oss << $3->code;
@@ -996,6 +1008,7 @@ var:
 
 ident: 
     IDENT { 
+        // Pass raw string of identifier
         $$ = new ident_struct();
         $$->ident = $1;
     }
@@ -1007,6 +1020,7 @@ number:
         ostringstream oss;
         stringstream ss;
 
+        // Create temporary variable for number (for use in expressions)
         $$->result_id = tm->tempGen();
         oss << ". " << tm->getTemp($$->result_id) << endl;
         oss << "= " << tm->getTemp($$->result_id) << ", " << $1 << endl;
