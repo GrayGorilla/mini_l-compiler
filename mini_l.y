@@ -33,6 +33,7 @@
   extern int currPos;
   extern FILE* yyin;
   const int NOT_ARRAY = -1;
+  const int INAVLID_ID = -1;
   TempManager* tm;
   LabelManager* lm;
   int yylex();
@@ -49,6 +50,7 @@
   };
   struct sta_loop_struct {
       string code;
+      vector<int> continue_ids;
   };
   struct declaration_struct {
       string code;
@@ -62,11 +64,13 @@
   };
   struct statement_struct {
       string code;
+      vector<int> continue_ids;
   };
   struct conditional_struct {
       string code;
       int true_id;
       int false_id;
+      vector<int> continue_ids;
   };
   struct var_list_struct {
       string code;
@@ -223,7 +227,12 @@ function:
     FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY { 
         $$ = new function_struct();
         ostringstream oss;
+        vector<int> continueIDs = $11->continue_ids;   
 
+        if (! continueIDs.empty()) {
+            cerr << "Error: 'continue' statements cannot be used outside of a loop." << endl;
+            exit(1);
+        }
         oss << "func " << $2->ident << endl;
         oss << $5->code << $8->code << $11->code;
         oss << "endfunc\n" << endl;
@@ -256,7 +265,7 @@ dec_list:
 sta_loop: 
     statement SEMICOLON { 
         $$ = new sta_loop_struct();
-
+        $$->continue_ids = $1->continue_ids;
         $$->code = $1->code;
         delete $1;
     }
@@ -264,8 +273,14 @@ sta_loop:
     statement SEMICOLON sta_loop { 
         $$ = new sta_loop_struct();
         ostringstream oss;
-
+        vector<int> staLoopContinueIDs = $3->continue_ids;
         oss << $1->code << $3->code;
+
+        // Get continueIDs from all statements
+        $$->continue_ids = $1->continue_ids;
+        for (int i = 0; i < staLoopContinueIDs.size(); i++) {
+            $$->continue_ids.push_back(staLoopContinueIDs.at(i));
+        }
         $$->code = oss.str(); 
         delete $1;
         delete $3;
@@ -343,8 +358,8 @@ statement:
     var ASSIGN expression { 
         $$ = new statement_struct();
         ostringstream oss;
-        const int exprResultID = $3->result_id;
-        const int indexID = $1->index_id;
+        int exprResultID = $3->result_id;
+        int indexID = $1->index_id;
 
         oss << $1->code << $3->code;
         if (indexID == NOT_ARRAY) {
@@ -373,7 +388,10 @@ statement:
         oss << ":= " << falseLabel << endl;
 
         oss << $4->code;
+        $$->continue_ids = $4->continue_ids;
         $$->code = oss.str();
+        delete $2;
+        delete $4;
     }
 | 
     WHILE bool_expr BEGINLOOP sta_loop ENDLOOP { 
@@ -388,18 +406,31 @@ statement:
         string loopLabel = lm->getLabel(loopID);
         string trueLabel = lm->getLabel(trueID);
         string falseLabel = lm->getLabel(falseID);
+        vector<int> continueIDs = $4->continue_ids;
 
+        // Initialize loop
         oss << ": " << loopLabel << endl;
+
+        // Check loop validity
         oss << $2->code;
         oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprResultID) << endl;
         oss << ":= " << falseLabel << endl;
 
+        // Loop body
         oss << ": " << trueLabel << endl;
         oss << $4->code;
-        oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
 
+        // Continue labels (if exists)
+        for (int i = 0; i < continueIDs.size(); i++) {
+            oss << ": " << lm->getLabel(continueIDs.at(i)) << endl;
+        }
+        // Loop back
+        oss << ":= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
         oss << ": " << falseLabel << endl;
+
         $$->code = oss.str();
+        delete $2;
+        delete $4;
     }
 | 
     DO BEGINLOOP sta_loop ENDLOOP WHILE bool_expr { 
@@ -409,15 +440,23 @@ statement:
         int loopID = lm->labelGen();
         int boolExprResultID = $6->result_id;
         string loopLabel = lm->getLabel(loopID);
+        vector<int> continueIDs = $3->continue_ids;
 
+        // Loop body (sta_loop before bool_expr code)
         oss << ": " << loopLabel << endl;
-        // Run sta_loop code before checking bool_expr
         oss << $3->code;
+
+        // Continue labels (if exists)
+        for (int i = 0; i < continueIDs.size(); i++) {
+            oss << ": " << lm->getLabel(continueIDs.at(i)) << endl;
+        }
         oss << $6->code;
 
+        // Check loop validity, then loop back if applicable
         oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
         $$->code = oss.str();
-
+        delete $3;
+        delete $6;
     }
 | 
     FOR var ASSIGN number SEMICOLON bool_expr SEMICOLON var ASSIGN expression BEGINLOOP sta_loop ENDLOOP { 
@@ -433,20 +472,37 @@ statement:
         string loopLabel = lm->getLabel(loopID);
         string trueLabel = lm->getLabel(trueID);
         string falseLabel = lm->getLabel(falseID);
+        vector<int> continueIDs = $12->continue_ids;
 
+        // Initialize loop
         oss << "= " << $2->ident << ", " << $4->number << endl;
         oss << ": " << loopLabel << endl;
+        
+        // Check loop validity
         oss << $6->code;
         oss << "?:= " << trueLabel << ", " << tm->getTemp(boolExprResultID) << endl;
         oss << ":= " << falseLabel << endl;
 
+        // Loop body
         oss << ": " << trueLabel << endl;
         oss << $12->code << $10->code;
+
+        // Continue labels (if exists)
+        for (int i = 0; i < continueIDs.size(); i++) {
+            oss << ": " << lm->getLabel(continueIDs.at(i)) << endl;
+        }
+        // Increment/Decrement, then loop back
         oss << "= " << $8->ident << ", " << tm->getTemp(exprResultID) << endl;
-        oss << "?:= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
+        oss << ":= " << loopLabel << ", " << tm->getTemp(boolExprResultID) << endl;
 
         oss << ": " << falseLabel << endl;
         $$->code = oss.str();
+        delete $2;
+        delete $4;
+        delete $6;
+        delete $8;
+        delete $10;
+        delete $12;
     }
 | 
     READ var_list { 
@@ -497,14 +553,25 @@ statement:
         delete $2;
     }
 | 
-    CONTINUE {}
+    CONTINUE {
+        $$ = new statement_struct();
+        ostringstream oss;
+        int continueID = lm->labelGen();
+
+        // Create goto label, push ID to continueIDs
+        oss << ":= " << lm->getLabel(continueID) << endl;
+        $$->continue_ids.push_back(continueID);
+        $$->code = oss.str();
+    }
 | 
     RETURN expression { 
         $$ = new statement_struct();
         ostringstream oss;
+
         oss << $2->code;
         oss << "ret " << tm->getTemp($2->result_id) << endl;
         $$->code = oss.str();
+        delete $2;
     }
 ;
 
@@ -527,6 +594,7 @@ conditional:
         $$->true_id = ifID;
         $$->false_id = breakID;
         $$->code = oss.str();
+        $$->continue_ids = $1->continue_ids;
     }
 | 
     sta_loop ELSE sta_loop { 
@@ -541,6 +609,9 @@ conditional:
         string elseLabel = lm->getLabel(elseID);
         string breakLabel = lm->getLabel(breakID);
 
+        vector<int> ifContinueIDs = $1->continue_ids;
+        vector<int> elseContinueIDs = $3->continue_ids;
+
         oss << ": " << ifLabel << endl;
         oss << $1->code;
         oss << ":= " << breakLabel << endl;
@@ -549,9 +620,18 @@ conditional:
         oss << $3->code;
         oss << ": " << breakLabel << endl;
 
+        // Get continueIDs from all statements
+        for (int i = 0; i < ifContinueIDs.size(); i++) {
+            $$->continue_ids.push_back(ifContinueIDs.at(i));
+        }
+        for (int i = 0; i < elseContinueIDs.size(); i++) {
+            $$->continue_ids.push_back(elseContinueIDs.at(i));
+        }
         $$->true_id = ifID;
         $$->false_id = elseID;
         $$->code = oss.str();
+        delete $1;
+        delete $3;
     }
 ;
 
