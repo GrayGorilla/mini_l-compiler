@@ -114,8 +114,9 @@
       string number;
       int result_id;
   };
-  struct term_ident_struct {
+  struct function_parameters_struct {
       string code;
+      vector<int> parameter_ids;
   };
   struct var_struct {
       string code;
@@ -155,7 +156,7 @@
   struct multiplicative_expr_struct *multiplicative_expr_semval;
   struct term_struct *term_semval;
   struct term_help_struct *term_help_semval;
-  struct term_ident_struct *term_ident_semval;
+  struct function_parameters_struct *function_parameters_semval;
   struct var_struct *var_semval;
   struct ident_struct *ident_semval;
   struct number_struct *number_semval;
@@ -185,7 +186,7 @@
 %type <multiplicative_expr_semval> multiplicative_expr
 %type <term_semval> term
 %type <term_help_semval> term_help
-%type <term_ident_semval> term_ident
+%type <function_parameters_semval> function_parameters
 %type <var_semval> var
 %type <ident_semval> ident
 %type <number_semval> number
@@ -926,9 +927,11 @@ term:
         ostringstream oss;
         int termHelpReultID = $2->result_id;
 
+        // Creates negative number in with temporary variables, store in code
         oss << $2->code;
         oss << "- " << tm->getTemp(termHelpReultID) << ", 0, " << tm->getTemp(termHelpReultID) << endl;
 
+        // Creates negative number, store in number string
         $$->result_id = termHelpReultID;
         if (! $2->number.empty()) {
             $$->number = "-" + $2->number; 
@@ -936,9 +939,41 @@ term:
         $$->code = oss.str();
     }
 | 
-    ident L_PAREN term_ident R_PAREN { printf("term -> L_PAREN term_ident R_PAREN\n"); }
+    ident L_PAREN function_parameters R_PAREN {
+        $$ = new term_struct();
+        ostringstream oss;
+        int functionReturnResultID = tm->tempGen();
+        vector<int> paramaterIDs = $3->parameter_ids;
+
+        // Makes function call with parameters
+        oss << $3->code;
+        for (int i = 0; i < paramaterIDs.size(); i++) {
+            oss << "param " << tm->getTemp(paramaterIDs.at(i)) << endl;
+        }
+        oss << ". " << tm->getTemp(functionReturnResultID) << endl;
+        oss << "call " << $1->ident << ", " << tm->getTemp(functionReturnResultID) << endl;
+        
+        $$->result_id = functionReturnResultID;
+        $$->code = oss.str();
+        $$->number = "";
+        delete $1;
+        delete $3;
+    }
 |
-    ident L_PAREN R_PAREN { printf("term -> L_PAREN R_PAREN\n"); }
+    ident L_PAREN R_PAREN {
+        $$ = new term_struct();
+        ostringstream oss;
+        int functionReturnResultID = tm->tempGen();
+
+        // Makes function call with no parameters
+        oss << ". " << tm->getTemp(functionReturnResultID) << endl;
+        oss << "call " << $1->ident << ", " << tm->getTemp(functionReturnResultID) << endl;
+        
+        $$->result_id = functionReturnResultID;
+        $$->code = oss.str();
+        $$->number = "";
+        delete $1;
+    }
 ;
 
 term_help: 
@@ -967,10 +1002,33 @@ term_help:
     }
 ;
 
-term_ident:  
-    expression {}
+function_parameters:  
+    expression {
+        $$ = new function_parameters_struct();
+        int exprResultID = $1->result_id;
+
+        // Push expression ID to vector as a paramater ID
+        $$->parameter_ids.push_back(exprResultID);
+        $$->code = $1->code;
+        delete $1;
+    }
 | 
-    expression COMMA term_ident {}
+    expression COMMA function_parameters {
+        $$ = new function_parameters_struct();
+        ostringstream oss;
+        int exprResultID = $1->result_id;
+        vector<int> paramaterIDs = $3->parameter_ids;
+
+        // Push all parameter result IDs to vector
+        oss << $1->code << $3->code;
+        $$->parameter_ids.push_back(exprResultID);
+        for (int i = 0; i < paramaterIDs.size(); i++) {
+            $$->parameter_ids.push_back(paramaterIDs.at(i));
+        }
+        $$->code = oss.str();
+        delete $1;
+        delete $3;
+    }
 ;
 
 var: 
