@@ -41,11 +41,15 @@
   struct program_struct {
       string code;
   };
+  struct functions_struct {
+      string code;
+  };
   struct function_struct {
       string code;
   };
   struct dec_list_struct {
       string code;
+      queue<string> identList;
   };
   struct sta_loop_struct {
       string code;
@@ -53,6 +57,7 @@
   };
   struct declaration_struct {
       string code;
+      queue<string> identList;
   };
   struct dec_help_struct {
       string code;
@@ -73,7 +78,7 @@
   };
   struct var_list_struct {
       string code;
-      queue<pair<string, int>> varTypes;
+      queue<pair<string, int> > varTypes;
   };
   struct bool_expr_struct {
       string code;
@@ -138,6 +143,7 @@
   int ival;
   char* sval;
   struct program_struct *program_semval;
+  struct functions_struct *functions_semval;
   struct function_struct *function_semval;
   struct dec_list_struct *dec_list_semval;
   struct sta_loop_struct *sta_loop_semval;
@@ -168,6 +174,7 @@
 %type <sval> IDENT
 %type <ival> NUMBER
 %type <program_semval> program
+%type <functions_semval> functions
 %type <function_semval> function
 %type <dec_list_semval> dec_list
 %type <sta_loop_semval> sta_loop
@@ -203,14 +210,25 @@
 
 %%
 
-program: 
-    { 
+program:
+    functions {
         $$ = new program_struct();
+        $$->code = $1->code;
+        delete $1;
+
+        cout << $$->code << endl;
+        delete $$;
+    }
+;
+
+functions: 
+    { 
+        $$ = new functions_struct();
         $$->code = "";
     }
 | 
-    function program { 
-        $$ = new program_struct();
+    function functions { 
+        $$ = new functions_struct();
         ostringstream oss;
 
         oss << $1->code << $2->code;
@@ -218,8 +236,6 @@ program:
         delete $1;
         delete $2;
 
-        cout << $$->code << endl;
-        delete $$;
     }
 ;
 
@@ -227,14 +243,25 @@ function:
     FUNCTION ident SEMICOLON BEGIN_PARAMS dec_list END_PARAMS BEGIN_LOCALS dec_list END_LOCALS BEGIN_BODY sta_loop END_BODY { 
         $$ = new function_struct();
         ostringstream oss;
-        vector<int> continueIDs = $11->continue_ids;   
+        vector<int> continueIDs = $11->continue_ids;  
+        string param; 
+        int paramID = 0;
 
         if (! continueIDs.empty()) {
             cerr << "Error: 'continue' statements cannot be used outside of a loop." << endl;
             exit(1);
         }
         oss << "func " << $2->ident << endl;
-        oss << $5->code << $8->code << $11->code;
+        oss << $5->code;
+        
+        // List parameters
+        while (! $5->identList.empty()) {
+            param = $5->identList.front();
+            oss << "= " << param << ", $" << paramID << endl;
+            $5->identList.pop();
+            paramID++;
+        }
+        oss << $8->code << $11->code;
         oss << "endfunc\n" << endl;
 
         $$->code = oss.str();
@@ -254,8 +281,20 @@ dec_list:
     declaration SEMICOLON dec_list { 
         $$ = new dec_list_struct();
         ostringstream oss;
+        string ident;
 
+        // Concatinate both identLists into one
         oss << $1->code << $3->code;
+        while (! $1->identList.empty()) {
+            ident = $1->identList.front();
+            $$->identList.push(ident);
+            $1->identList.pop();
+        }
+        while (! $3->identList.empty()) {
+            ident = $3->identList.front();
+            $$->identList.push(ident);
+            $3->identList.pop();
+        }
         $$->code = oss.str();
         delete $1;
         delete $3;
@@ -297,6 +336,7 @@ declaration:
         if ($3->array_size.empty()) {
             while (! $1->identList.empty()) {
                 identCode = $1->identList.front();
+                $$->identList.push(identCode);
                 $1->identList.pop();
                 oss << ". " << identCode << endl;
             }
@@ -304,6 +344,7 @@ declaration:
         } else {
             while (! $1->identList.empty()) {
                 identCode = $1->identList.front();
+                $$->identList.push(identCode);
                 $1->identList.pop();
                 oss << ".[] " << identCode << $3->array_size << endl;
             }
