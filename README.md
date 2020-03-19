@@ -22,9 +22,9 @@ The code can be run by following the sequence of commands:
 
     make clean
     make
-    ./mini_l *filename*.min > filename.mil   
-    /*This performs lexical analysis, Parsing, Semantic Analysis and MIL Code generation on the file containing mini l code in filename.min, and redirects the MIL code output to filename.mil*/
-    ./mil_run filename.mil < input.txt
+    ./mini_l *filename*.min > out.mil   
+    /*This performs lexical analysis, Parsing, Semantic Analysis and MIL Code generation on the file containing mini l code in *filename*.min, and redirects the MIL code output to out.mil*/
+    ./mil_run out.mil < input.txt
     /*executing the generated MIL code with input provided from input.txt*/
 
 
