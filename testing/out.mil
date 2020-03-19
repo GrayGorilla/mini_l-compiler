@@ -1,259 +1,59 @@
+func fibonacci
+. k
+= k, $0
+. __temp__0
+= __temp__0, k
+. __temp__1
+= __temp__1, 2
+. __temp__2
+<= __temp__2, __temp__0, __temp__1
+?:= __label__0, __temp__2
+:= __label__1
+: __label__0
+. __temp__3
+= __temp__3, 1
+ret __temp__3
+: __label__1
+. __temp__4
+= __temp__4, k
+. __temp__5
+= __temp__5, 1
+. __temp__6
+- __temp__6, __temp__4, __temp__5
+param __temp__6
+. __temp__7
+call fibonacci, __temp__7
+. __temp__8
+= __temp__8, k
+. __temp__9
+= __temp__9, 2
+. __temp__10
+- __temp__10, __temp__8, __temp__9
+param __temp__10
+. __temp__11
+call fibonacci, __temp__11
+. __temp__12
++ __temp__12, __temp__7, __temp__11
+ret __temp__12
+endfunc
+
 func main
 . n
-. i
-. j
-. k
-.[] t, 20
-. __temp__1
-= __temp__1, i
-. __temp__2
-= __temp__2, j
-.< i
-.< j
-. __temp__3
-= __temp__3, k
-. __temp__4
-= __temp__4, 0
-= k, __temp__4
-. __temp__5
-= __temp__5, n
-. __temp__6
-= __temp__6, 20
-= n, __temp__6
-: __label__3
-. __temp__7
-= __temp__7, k
-. __temp__8
-=[] __temp__8, t, __temp__7
-. __temp__9
-= __temp__9, k
-[]= t, __temp__7, __temp__9
-. __temp__10
-= __temp__10, k
-. __temp__11
-= __temp__11, k
-. __temp__12
-= __temp__12, 1
+. fib_n
 . __temp__13
-+ __temp__13, __temp__11, __temp__12
-= k, __temp__13
+= __temp__13, n
+.< n
 . __temp__14
-= __temp__14, k
+= __temp__14, fib_n
 . __temp__15
-= __temp__15, 2
+= __temp__15, n
+param __temp__15
 . __temp__16
-% __temp__16, __temp__14, __temp__15
+call fibonacci, __temp__16
+= fib_n, __temp__16
 . __temp__17
-= __temp__17, 0
-. __temp__18
-== __temp__18, __temp__16, __temp__17
-?:= __label__1, __temp__18
-:= __label__2
-: __label__1
-:= __label__0
-: __label__2
-. __temp__19
-= __temp__19, k
-. __temp__20
-= __temp__20, 1
-. __temp__21
-- __temp__21, __temp__19, __temp__20
-. __temp__22
-=[] __temp__22, t, __temp__21
-.[]> t, __temp__21
-: __label__0
-. __temp__23
-= __temp__23, k
-. __temp__24
-= __temp__24, n
-. __temp__25
-< __temp__25, __temp__23, __temp__24
-?:= __label__3, __temp__25
-. __temp__26
-= __temp__26, i
-. __temp__27
-= __temp__27, j
-. __temp__28
-< __temp__28, __temp__26, __temp__27
-. __temp__29
-= __temp__29, j
-. __temp__30
-= __temp__30, n
-. __temp__31
-< __temp__31, __temp__29, __temp__30
-. __temp__32
-= __temp__32, i
-. __temp__33
-= __temp__33, 0
-. __temp__34
->= __temp__34, __temp__32, __temp__33
-. __temp__35
-&& __temp__35, __temp__31, __temp__34
-. __temp__36
-&& __temp__36, __temp__28, __temp__35
-?:= __label__10, __temp__36
-:= __label__11
-: __label__10
-. __temp__37
-= __temp__37, i
-. __temp__38
-=[] __temp__38, t, __temp__37
-. __temp__39
-= __temp__39, i
-. __temp__40
-= __temp__40, 2
-. __temp__41
-* __temp__41, __temp__39, __temp__40
-[]= t, __temp__37, __temp__41
-. __temp__42
-= __temp__42, j
-. __temp__43
-=[] __temp__43, t, __temp__42
-. __temp__44
-= __temp__44, j
-. __temp__45
-= __temp__45, 2
-. __temp__46
-* __temp__46, __temp__44, __temp__45
-[]= t, __temp__42, __temp__46
-. __temp__47
-= __temp__47, k
-. __temp__48
-= __temp__48, i
-. __temp__49
-=[] __temp__49, t, __temp__48
-= k, __temp__49
-. __temp__50
-= __temp__50, i
-. __temp__51
-=[] __temp__51, t, __temp__50
-. __temp__52
-= __temp__52, j
-. __temp__53
-=[] __temp__53, t, __temp__52
-[]= t, __temp__50, __temp__53
-. __temp__54
-= __temp__54, j
-. __temp__55
-=[] __temp__55, t, __temp__54
-. __temp__56
-= __temp__56, k
-[]= t, __temp__54, __temp__56
-:= __label__12
-: __label__11
-: __label__7
-. __temp__57
-= __temp__57, i
-. __temp__58
-= __temp__58, j
-. __temp__59
->= __temp__59, __temp__57, __temp__58
-. __temp__60
-= __temp__60, 0
-. __temp__61
-|| __temp__61, __temp__59, __temp__60
-?:= __label__8, __temp__61
-:= __label__9
-: __label__8
-. __temp__62
-= __temp__62, k
-. __temp__63
-= __temp__63, 1
-. __temp__64
-= __temp__64, i
-. __temp__65
-+ __temp__65, __temp__63, __temp__64
-. __temp__66
-= __temp__66, j
-. __temp__67
-- __temp__67, __temp__65, __temp__66
-. __temp__68
-= __temp__68, 3
-. __temp__69
-% __temp__69, __temp__67, __temp__68
-= k, __temp__69
-. __temp__70
-= __temp__70, i
-. __temp__71
-= __temp__71, i
-. __temp__72
-= __temp__72, 1
-. __temp__73
-- __temp__73, __temp__71, __temp__72
-= i, __temp__73
-. __temp__74
-= __temp__74, k
-. __temp__75
-= __temp__75, 1
-. __temp__76
-> __temp__76, __temp__74, __temp__75
-?:= __label__5, __temp__76
-:= __label__6
-: __label__5
-:= __label__4
-: __label__6
-. __temp__77
-= __temp__77, k
-.> k
-: __label__4
-:= __label__7
-: __label__9
-: __label__12
-. __temp__78
-= __temp__78, i
-. __temp__79
-= __temp__79, j
-. __temp__80
-= __temp__80, k
-.> i
-.> j
-.> k
-. __temp__81
-= __temp__81, i
-. __temp__82
-= __temp__82, n
-. __temp__83
-< __temp__83, __temp__81, __temp__82
-. __temp__84
-= __temp__84, i
-. __temp__85
-= __temp__85, 0
-. __temp__86
->= __temp__86, __temp__84, __temp__85
-. __temp__87
-&& __temp__87, __temp__83, __temp__86
-?:= __label__13, __temp__87
-:= __label__14
-: __label__13
-. __temp__88
-= __temp__88, i
-. __temp__89
-=[] __temp__89, t, __temp__88
-.[]> t, __temp__88
-: __label__14
-. __temp__90
-= __temp__90, j
-. __temp__91
-= __temp__91, n
-. __temp__92
-< __temp__92, __temp__90, __temp__91
-. __temp__93
-= __temp__93, j
-. __temp__94
-= __temp__94, 0
-. __temp__95
->= __temp__95, __temp__93, __temp__94
-. __temp__96
-&& __temp__96, __temp__92, __temp__95
-?:= __label__15, __temp__96
-:= __label__16
-: __label__15
-. __temp__97
-= __temp__97, j
-. __temp__98
-=[] __temp__98, t, __temp__97
-.[]> t, __temp__97
-: __label__16
+= __temp__17, fib_n
+.> fib_n
 endfunc
 
 
